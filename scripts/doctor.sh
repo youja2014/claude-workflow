@@ -70,5 +70,24 @@ if command -v node >/dev/null 2>&1; then
 fi
 
 echo
+echo "claude-workflow location:"
+if [[ -n "${CLAUDE_WORKFLOW_HOME:-}" && -d "$CLAUDE_WORKFLOW_HOME/harness" ]]; then
+  echo "  [OK]   CLAUDE_WORKFLOW_HOME = $CLAUDE_WORKFLOW_HOME"
+else
+  resolved=""
+  if [[ -x "$(dirname "$0")/find-workflow-home.sh" ]]; then
+    resolved="$(bash "$(dirname "$0")/find-workflow-home.sh" 2>/dev/null || true)"
+  fi
+  if [[ -n "$resolved" ]]; then
+    echo "  [WARN] CLAUDE_WORKFLOW_HOME not set; resolved via fallback to: $resolved"
+    echo "         export CLAUDE_WORKFLOW_HOME=$resolved  # recommended for /scaffold"
+    WARN=$((WARN+1))
+  else
+    echo "  [WARN] CLAUDE_WORKFLOW_HOME not set and no fallback resolved"
+    WARN=$((WARN+1))
+  fi
+fi
+
+echo
 echo "Summary: $PASS pass, $WARN warn, $FAIL fail"
 [[ "$FAIL" -gt 0 ]] && exit 1 || exit 0

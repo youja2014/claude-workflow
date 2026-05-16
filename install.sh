@@ -122,6 +122,8 @@ write_file() {
 TMP_LOCK="$(mktemp)"
 echo "# claude-workflow installed files. Format: <sha256>  <relative-path>" > "$TMP_LOCK"
 echo "# Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$TMP_LOCK"
+# Record source directory so find-workflow-home.sh can locate the clone later.
+echo "# source_dir=$SCRIPT_DIR" >> "$TMP_LOCK"
 
 # Iterate harness files
 mapfile -t SRC_FILES < <(cd "$HARNESS_DIR" && find . -type f | sed 's|^\./||' | sort)

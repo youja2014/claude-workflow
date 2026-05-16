@@ -24,22 +24,23 @@ argument-hint: <project-name> --stack=<cli|fastapi|nestjs|vite-react> [--desc ".
 
 1. **인자 검증**: `$ARGUMENTS` 가 위 형식을 만족하는지 확인. 부족하면 사용자에게 물어보기.
 
-2. **claude-workflow 위치 확인**: 다음 순서로 탐색
-   - `$CLAUDE_WORKFLOW_HOME` 환경변수
-   - `D:/Personal/workspace/claude-workflow`
-   - `~/claude-workflow`
-   
-   없으면 사용자에게 경로 요청.
+2. **claude-workflow 위치 확인**: 해석 스크립트에 위임
+   ```bash
+   WORKFLOW_HOME="$(bash ~/.claude/scripts/find-workflow-home.sh 2>/dev/null \
+                   || bash "$CLAUDE_WORKFLOW_HOME/scripts/find-workflow-home.sh")"
+   ```
+   탐색 순서: `$CLAUDE_WORKFLOW_HOME` → 스크립트 자신의 부모 → `~/.claude/.claude-workflow.lock` 의 `# source_dir=` 라인.
+   모두 실패하면 사용자에게 경로 입력 요청.
 
 3. **doctor 실행**: 필수 도구 검증
    ```bash
-   bash "$CLAUDE_WORKFLOW_HOME/scripts/doctor.sh"
+   bash "$WORKFLOW_HOME/scripts/doctor.sh"
    ```
    실패하면 누락된 도구를 안내하고 중단.
 
 4. **scaffold 호출**:
    ```bash
-   bash "$CLAUDE_WORKFLOW_HOME/scripts/scaffold.sh" \
+   bash "$WORKFLOW_HOME/scripts/scaffold.sh" \
      --stack <stack> \
      --name <project-name> \
      --dest <dest> \
