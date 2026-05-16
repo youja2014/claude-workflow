@@ -5,6 +5,7 @@
 ## 권장 파일
 
 - `glossary.md` — 도메인 용어 정의 (Ubiquitous Language)
+- `erd.md` — 도메인 ERD (mermaid `erDiagram`). 작은 CLI 도구라 엔티티가 거의 없으면 비워둬도 됨
 - `<entity>.md` — 엔티티별 모델 / 관계 / 제약 / 라이프사이클
 - `rules.md` — 비즈니스 규칙 (불변식, 정책)
 - `references/` — 외부 도메인 자료 인용 (논문, 사양, 표준 문서)

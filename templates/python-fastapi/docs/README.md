@@ -9,7 +9,7 @@
 | [`architecture.md`](./architecture.md) | 폴더 구조 + 라이브러리 선택 근거 | 구조 변경 시 |
 | [`status.md`](./status.md) | 현재 진행 상황 한 페이지 | 퇴근 시 |
 | [`design/`](./design/) | frontend UI/UX 문서 (mockup, 컴포넌트 가이드) | 디자인 결정 시 |
-| [`domain/`](./domain/) | 도메인 용어 / 모델 / 비즈니스 룰 | 도메인 학습/변경 시 |
+| [`domain/`](./domain/) | 도메인 용어 / 모델 / 비즈니스 룰 / 도메인 ERD (`erd.md`) | 도메인 학습/변경 시 |
 | [`plans/`](./plans/) | `goals.md`(장기) / `wbs.md`(작업 분할) / `exec-plans/<feature>.md`(기능별 계획) | 출근·계획 단계 |
 | [`decisions/`](./decisions/) | ADR (immutable, `NNNN-<topic>.md`) | 의사결정 시 |
 | [`handoffs/`](./handoffs/) | 세션 인계 (`YYYY-MM-DD.md`, 누적) | 퇴근 시 |
