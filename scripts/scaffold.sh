@@ -37,7 +37,8 @@ case "$STACK" in
   fastapi)     TEMPLATE_DIR="$TEMPLATES_DIR/python-fastapi"; LANG="python" ;;
   nestjs)      TEMPLATE_DIR="$TEMPLATES_DIR/ts-nestjs"; LANG="ts" ;;
   vite-react)  TEMPLATE_DIR="$TEMPLATES_DIR/ts-vite-react"; LANG="ts" ;;
-  *) echo "ERROR: unknown --stack $STACK" >&2; exit 2 ;;
+  nx-monorepo) TEMPLATE_DIR="$TEMPLATES_DIR/ts-nx"; LANG="ts" ;;
+  *) echo "ERROR: unknown --stack $STACK (cli|fastapi|nestjs|vite-react|nx-monorepo)" >&2; exit 2 ;;
 esac
 
 [[ -d "$TEMPLATE_DIR" ]] || { echo "ERROR: template not found: $TEMPLATE_DIR" >&2; exit 1; }

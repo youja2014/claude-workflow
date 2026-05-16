@@ -1,0 +1,53 @@
+{
+  "name": "__project_kebab__",
+  "version": "0.1.0",
+  "description": "__description__",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@4.5.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "workspaces": ["apps/*", "libs/*"],
+  "scripts": {
+    "prepare": "husky",
+    "lint": "nx run-many --target=lint",
+    "lint:fix": "nx run-many --target=lint --fix",
+    "format": "prettier --write \"{apps,libs}/**/*.{ts,tsx,js,json,md}\"",
+    "typecheck": "nx run-many --target=typecheck",
+    "test": "nx run-many --target=test",
+    "test:cov": "nx run-many --target=test --coverage",
+    "build": "nx run-many --target=build",
+    "graph": "nx graph",
+    "affected": "nx affected --target=lint --target=test --target=build",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "doctor": "node -v && yarn -v && docker --version"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@nx/eslint": "^20.3.0",
+    "@nx/eslint-plugin": "^20.3.0",
+    "@nx/jest": "^20.3.0",
+    "@nx/nest": "^20.3.0",
+    "@nx/react": "^20.3.0",
+    "@nx/vite": "^20.3.0",
+    "@nx/workspace": "^20.3.0",
+    "@types/node": "^22.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.2.0",
+    "nx": "^20.3.0",
+    "prettier": "^3.4.0",
+    "typescript": "^5.6.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,yml,yaml,css}": ["prettier --write"]
+  }
+}

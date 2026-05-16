@@ -1,0 +1,25 @@
+node_modules/
+dist/
+build/
+coverage/
+.nx/cache
+.nx/workspace-data
+tmp/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Yarn
+.yarn/cache
+.yarn/install-state.gz
+.pnp.*
