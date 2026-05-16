@@ -30,6 +30,50 @@
 
 (DB / cache / message queue / 외부 API 등. 각 항목에 1줄 — "왜 필요한지" 위주.)
 
+## CI / 검증
+
+본 템플릿은 **vendor 종속 CI 파일을 포함하지 않음** — GitHub Actions / GitLab CI / CircleCI 등 사용자가 선택. 아래는 vendor 무관 권장 jobs.
+
+### 로컬 1차 검증 (개인 머신)
+
+```bash
+make lint && make typecheck && make test && make docker-build
+```
+
+### CI 권장 jobs (vendor 무관, 공유 환경)
+
+**필수:**
+- [ ] `yarn install --immutable` — lockfile 무결성
+- [ ] `yarn lint` (`nx affected -t lint` 권장 — 변경된 프로젝트만)
+- [ ] `yarn typecheck`
+- [ ] `yarn test` (`nx affected -t test` 권장)
+- [ ] secret scan (e.g. gitleaks)
+
+**권장:**
+- [ ] `yarn build` (`nx affected -t build`)
+- [ ] docker build (PR 시만, cache 적극 활용)
+- [ ] coverage 리포트 업로드 (codecov 등)
+
+**고급(선택):**
+- [ ] dependency audit (`yarn npm audit`)
+- [ ] SAST (semgrep)
+- [ ] 컨테이너 이미지 취약점 (trivy)
+
+### 트리거 권장
+
+- `push` to `main`/`master`: 전체
+- `pull_request`: 전체
+- 다른 branch: skip (비용 절감)
+
+### vendor 별 파일 위치 (선택 시 작성)
+
+| vendor | 위치 |
+|---|---|
+| GitHub Actions | `.github/workflows/ci.yml` |
+| GitLab CI | `.gitlab-ci.yml` |
+| CircleCI | `.circleci/config.yml` |
+| Drone | `.drone.yml` |
+
 ## DB 스키마 ERD
 
 물리 ERD — 실제 테이블 / 컬럼 / 타입 / PK·FK / 제약 / 인덱스. 도메인 ERD 와 별도 책임 ([`domain/erd.md`](./domain/erd.md) 참조).
