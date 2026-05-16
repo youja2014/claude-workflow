@@ -40,11 +40,40 @@
 - `doctor.sh`: uv, yarn, docker, git, python>=3.12, node lts 검증
 - `settings-merge.py`: `settings.partial.json` 을 `~/.claude/settings.json` 에 hook 중복 없이 머지
 
+## Commit & Versioning (이 프로젝트의 모든 커밋)
+
+### Conventional Commits
+
+- 형식: `<type>(<scope>): <subject>` — subject 70자 이하, 명령형, 마침표 없음
+- **type 허용**: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `ci`
+- **scope** (이 프로젝트에서 자주 쓰는 것):
+  - `templates/ts-nx`, `templates/python-cli`, `templates/python-fastapi` — 보일러플레이트 변경
+  - `harness` — 룰/스킬/커맨드/훅 (글로벌 영향)
+  - `scripts` — install/scaffold/test 로직
+  - `hooks` — `harness/hooks/*` 한정
+  - 생략 가능 — 단 가능한 한 명시
+- BREAKING change: `<type>(<scope>)!: ...` + 본문에 `BREAKING CHANGE: <설명>` 한 줄
+- 본문: "왜" 위주로 1-2 단락. "what" 은 diff가 말함
+- WIP/squash-me 커밋 금지 — 작업 완료 후 단일 논리 변경으로 커밋
+
+### Semantic Versioning (해석 규칙)
+
+이 프로젝트는 별도 VERSION/태그를 발급하지 않는 메타 시스템이지만, commit type 자체는 SemVer 영향도로 해석할 수 있어야 합니다:
+
+- `fix:` → **PATCH** (호환 가능한 버그/race/문서 수정)
+- `feat:` → **MINOR** (호환 가능한 신규 기능, 신규 템플릿/스킬 추가 등)
+- `feat!:` / `fix!:` / 본문에 `BREAKING CHANGE:` → **MAJOR** (사용자 워크플로 깨짐: 플래그 제거, 디렉토리 구조 변경, 플레이스홀더 명 변경 등)
+
+**판단 기준**:
+- 사용자의 기존 `~/.claude/` 또는 scaffold 결과물이 그대로 동작하면 PATCH 또는 MINOR
+- 기존 사용자가 수동 마이그레이션을 해야 하면 MAJOR (`!` 표기 필수)
+- 예시: `feat(templates)!: drop legacy ts-nestjs/ts-vite-react` (commit `7107501`) — `--stack=nestjs` 가 제거되어 사용자 워크플로 깨짐 → MAJOR
+
 ## Definition of Done (이 프로젝트의 모든 변경)
 
 PR/커밋 전에 반드시:
 
-1. **계획 명시**: 변경 의도가 issue/commit message에 1줄 이상
+1. **계획 명시**: 변경 의도가 issue/commit message에 1줄 이상 (commit 형식은 위 "Commit & Versioning" 따름)
 2. **참조 검증**: 추가/변경된 파일이 다른 파일에서 참조되는지 grep으로 확인
 3. **로컬 검증**: `bash install.sh --dry-run` 으로 install 결과 확인
 4. **템플릿 검증**: 수정한 템플릿이 실제로 `cd templates/<stack> && make lint && make typecheck && make test` 통과
