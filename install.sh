@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# install.sh — Deploy harness/ contents to ~/.claude/
+# install.sh — Deploy harness/global/ contents to ~/.claude/
+#   (harness/project/ is NOT deployed globally — it is per-project assets
+#    consumed by scripts/scaffold.sh during project scaffolding/adoption.)
 #
 # Behavior:
 #   - Copies (not symlinks) for Windows compatibility
@@ -16,7 +18,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HARNESS_DIR="$SCRIPT_DIR/harness"
+HARNESS_DIR="$SCRIPT_DIR/harness/global"
 TARGET_DIR="${CLAUDE_HOME:-$HOME/.claude}"
 LOCK_FILE="$TARGET_DIR/.claude-workflow.lock"
 BACKUP_DIR="$TARGET_DIR/backups/claude-workflow-$(date +%Y%m%d-%H%M%S)"
@@ -39,7 +41,7 @@ for arg in "$@"; do
 done
 
 if [[ ! -d "$HARNESS_DIR" ]]; then
-  echo "ERROR: harness/ directory not found at $HARNESS_DIR" >&2
+  echo "ERROR: harness/global/ directory not found at $HARNESS_DIR" >&2
   exit 1
 fi
 

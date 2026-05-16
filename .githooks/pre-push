@@ -2,7 +2,7 @@
 # pre-push — Block push when 'make verify' fails.
 #
 # Installed via:  bash scripts/install-git-hooks.sh
-# Bypass:         not via --no-verify (banned by harness/hooks/block-dangerous.sh
+# Bypass:         not via --no-verify (banned by harness/global/hooks/block-dangerous.sh
 #                 inside Claude Code; humans can use it intentionally).
 
 set -uo pipefail

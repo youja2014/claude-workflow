@@ -32,7 +32,7 @@ argument-hint: <project-name> --stack=<cli|fastapi|nx-monorepo> [--desc "..."]
    }
    ```
    resolver 탐색 순서: `$CLAUDE_WORKFLOW_HOME` → 스크립트 자신의 부모 → `~/.claude/.claude-workflow.lock` 의 `# source_dir=` 라인.
-   `install.sh` 가 `harness/scripts/find-workflow-home.sh` 를 `~/.claude/scripts/` 로 함께 배포하므로 항상 사용 가능.
+   `install.sh` 가 `harness/global/scripts/find-workflow-home.sh` 를 `~/.claude/scripts/` 로 함께 배포하므로 항상 사용 가능.
 
 3. **doctor 실행**: 필수 도구 검증
    ```bash

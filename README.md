@@ -74,7 +74,7 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
 - **사용자 글로벌 (이 프로젝트가 손대지 않음)**: `CLAUDE.md`(사용자 글로벌), `rules/common/{code-quality,security,git}.md` 등 범용 룰. 사용자 책임으로 별도 관리.
 - **로컬 머신 전용 (덮어쓰기 절대 금지)**: `CLAUDE.local.md`, `settings.local.json`
 
-즉 `harness/rules/` 에는 **스택별 룰만** 둡니다(`common/` 디렉토리 없음). 범용 룰은 사용자가 직접 작성하거나
+즉 `harness/global/rules/` 에는 **스택별 룰만** 둡니다(`common/` 디렉토리 없음). 범용 룰은 사용자가 직접 작성하거나
 외부 카탈로그에서 가져와 `~/.claude/rules/common/` 에 두며, 이 프로젝트의 install/uninstall 은 그 영역을 건드리지 않습니다.
 
 ## 스택별 클린 아키텍처 요약
@@ -87,7 +87,7 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
   - `libs/shared-types` — 공유 타입
   - 프로젝트 간 경계는 `@nx/enforce-module-boundaries` (project.json `tags`) 로 자동 강제
 
-자세한 룰은 `harness/rules/` 참조.
+자세한 룰은 `harness/global/rules/` 참조.
 
 ## 외부 스킬 카탈로그
 

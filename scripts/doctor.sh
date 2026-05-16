@@ -75,7 +75,7 @@ if [[ -n "${CLAUDE_WORKFLOW_HOME:-}" && -d "$CLAUDE_WORKFLOW_HOME/harness" ]]; t
   echo "  [OK]   CLAUDE_WORKFLOW_HOME = $CLAUDE_WORKFLOW_HOME"
 else
   resolved=""
-  finder="$(dirname "$0")/../harness/scripts/find-workflow-home.sh"
+  finder="$(dirname "$0")/../harness/global/scripts/find-workflow-home.sh"
   if [[ -x "$finder" ]]; then
     resolved="$(bash "$finder" 2>/dev/null || true)"
   fi

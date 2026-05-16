@@ -52,12 +52,12 @@
   - `templates/ts-nx`, `templates/python-cli`, `templates/python-fastapi` — 보일러플레이트 변경
   - `harness` — 룰/스킬/커맨드/훅 (글로벌 영향)
   - `scripts` — install/scaffold/test 로직
-  - `hooks` — `harness/hooks/*` 한정
+  - `hooks` — `harness/global/hooks/*` 한정 (글로벌 hook). 프로젝트 주입 hook 은 `harness/project/` scope
   - 생략 가능 — 단 가능한 한 명시
 - BREAKING change: `<type>(<scope>)!: ...` + 본문에 `BREAKING CHANGE: <설명>` 한 줄
 - 본문: "왜" 위주로 1-2 단락. "what" 은 diff가 말함
 - WIP/squash-me 커밋 금지 — 작업 완료 후 단일 논리 변경으로 커밋
-- 강제: `.githooks/commit-msg` 가 subject 정규식을 검증 (`bash scripts/install-git-hooks.sh` 로 활성화). `--no-verify` 우회는 의도적인 사람만 사용 — Claude 는 절대 사용 금지(`harness/hooks/block-dangerous.sh` 가 차단)
+- 강제: `.githooks/commit-msg` 가 subject 정규식을 검증 (`bash scripts/install-git-hooks.sh` 로 활성화). `--no-verify` 우회는 의도적인 사람만 사용 — Claude 는 절대 사용 금지(`harness/global/hooks/block-dangerous.sh` 가 차단)
 
 ### Semantic Versioning (해석 규칙)
 
@@ -80,7 +80,7 @@ PR/커밋 전에 반드시:
 2. **참조 검증**: 추가/변경된 파일이 다른 파일에서 참조되는지 grep으로 확인
 3. **로컬 검증**: `bash install.sh --dry-run` 으로 install 결과 확인
 4. **템플릿 검증**: 수정한 템플릿이 실제로 `cd templates/<stack> && make lint && make typecheck && make test` 통과
-5. **결정 기록**: 트레이드오프가 있는 결정은 `harness/rules/` 또는 `README.md` 에 한 줄로 기록
+5. **결정 기록**: 트레이드오프가 있는 결정은 `harness/global/rules/` 또는 `README.md` 에 한 줄로 기록
 
 ## Claude Code 설정 우선순위 (공식 규칙)
 

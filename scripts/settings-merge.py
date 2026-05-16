@@ -14,7 +14,7 @@ Rules
 
 Usage
 -----
-    python3 settings-merge.py --partial harness/settings.json --target ~/.claude/settings.json
+    python3 settings-merge.py --partial harness/global/settings.json --target ~/.claude/settings.json
 """
 
 from __future__ import annotations
