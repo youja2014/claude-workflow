@@ -1,34 +1,114 @@
 #!/usr/bin/env bash
-# scaffold.sh — Create a new project from a template.
+# scaffold.sh — Scaffold a new project (default) or adopt an existing one (--mode=existing).
 #
-# Called by /scaffold command or directly:
+# New mode (default):
 #   bash scripts/scaffold.sh --stack <cli|fastapi|nx-monorepo> --name <project> [--dest <dir>] [--desc "..."]
+#
+# Existing mode (inject claude-workflow components into a pre-existing repo):
+#   bash scripts/scaffold.sh --mode=existing --components=<comma> [--dest <dir>]
+#   Components (B.1): githooks-universal, install-script
+#   --dest must contain .git/ (defaults to current dir).
+#   Conflict policy: skip if destination file already exists (idempotent).
+#   The slash command is responsible for prompting users about overwrites.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 TEMPLATES_DIR="$ROOT_DIR/templates"
+PROJECT_OVERLAY="$ROOT_DIR/harness/project"
 
+MODE=""
 STACK=""
 NAME=""
 DEST=""
 DESC=""
+COMPONENTS=""
 DRY_RUN=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --stack) STACK="$2"; shift 2 ;;
-    --name)  NAME="$2";  shift 2 ;;
-    --dest)  DEST="$2";  shift 2 ;;
-    --desc)  DESC="$2";  shift 2 ;;
-    --dry-run) DRY_RUN=1; shift ;;
+    --mode)         MODE="$2"; shift 2 ;;
+    --mode=*)       MODE="${1#*=}"; shift ;;
+    --components)   COMPONENTS="$2"; shift 2 ;;
+    --components=*) COMPONENTS="${1#*=}"; shift ;;
+    --stack)        STACK="$2"; shift 2 ;;
+    --stack=*)      STACK="${1#*=}"; shift ;;
+    --name)         NAME="$2"; shift 2 ;;
+    --name=*)       NAME="${1#*=}"; shift ;;
+    --dest)         DEST="$2"; shift 2 ;;
+    --dest=*)       DEST="${1#*=}"; shift ;;
+    --desc)         DESC="$2"; shift 2 ;;
+    --desc=*)       DESC="${1#*=}"; shift ;;
+    --dry-run)      DRY_RUN=1; shift ;;
     -h|--help)
-      sed -n '2,8p' "$0" | sed 's/^# \?//'; exit 0 ;;
+      sed -n '2,13p' "$0" | sed 's/^# \?//'; exit 0 ;;
     *) echo "Unknown flag: $1" >&2; exit 2 ;;
   esac
 done
 
+# ============================================================
+# MODE: existing (adopt claude-workflow into existing repo)
+# ============================================================
+if [[ "$MODE" == "existing" ]]; then
+  [[ -z "$COMPONENTS" ]] && { echo "ERROR: --components required in existing mode" >&2; exit 2; }
+  DEST="${DEST:-$(pwd)}"
+  [[ -d "$DEST/.git" ]] || { echo "ERROR: --dest must contain .git/ (got: $DEST)" >&2; exit 1; }
+
+  installed=()
+  skipped=()
+
+  install_file() {
+    local src="$1" dst="$2"
+    if [[ ! -f "$src" ]]; then
+      echo "ERROR: source not found: $src" >&2
+      exit 1
+    fi
+    if [[ -e "$dst" ]]; then
+      skipped+=("$dst")
+      return
+    fi
+    mkdir -p "$(dirname "$dst")"
+    if [[ "$DRY_RUN" == "1" ]]; then
+      echo "[dry] install: $dst <- $src"
+    else
+      cp -p "$src" "$dst"
+    fi
+    installed+=("$dst")
+  }
+
+  IFS=',' read -ra COMP_LIST <<< "$COMPONENTS"
+  for comp in "${COMP_LIST[@]}"; do
+    case "$comp" in
+      githooks-universal)
+        install_file "$PROJECT_OVERLAY/.githooks/commit-msg" "$DEST/.githooks/commit-msg"
+        install_file "$PROJECT_OVERLAY/.githooks/pre-push"   "$DEST/.githooks/pre-push"
+        chmod +x "$DEST/.githooks/commit-msg" "$DEST/.githooks/pre-push" 2>/dev/null || true
+        ;;
+      install-script)
+        install_file "$PROJECT_OVERLAY/scripts/install-git-hooks.sh" "$DEST/scripts/install-git-hooks.sh"
+        chmod +x "$DEST/scripts/install-git-hooks.sh" 2>/dev/null || true
+        ;;
+      *)
+        echo "ERROR: unknown component: $comp" >&2
+        echo "Available: githooks-universal, install-script" >&2
+        exit 2
+        ;;
+    esac
+  done
+
+  echo "[scaffold-existing] installed: ${#installed[@]}"
+  for p in "${installed[@]}"; do echo "  + $p"; done
+  if [[ ${#skipped[@]} -gt 0 ]]; then
+    echo "[scaffold-existing] skipped (already exists): ${#skipped[@]}"
+    for p in "${skipped[@]}"; do echo "  = $p"; done
+  fi
+  exit 0
+fi
+
+# ============================================================
+# MODE: new (default) — original behavior
+# ============================================================
 [[ -z "$STACK" ]] && { echo "ERROR: --stack required (cli|fastapi|nx-monorepo)" >&2; exit 2; }
 [[ -z "$NAME"  ]] && { echo "ERROR: --name required" >&2; exit 2; }
 
