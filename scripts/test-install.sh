@@ -77,7 +77,8 @@ NEW_CONTENT="$(cat "$MODIFIED_PATH")"
 pass "--yes overwrites modified files (expected)"
 
 echo "=== 4. uninstall ==="
-bash "$ROOT_DIR/uninstall.sh" --yes >/dev/null
+# uninstall.sh defaults to dry-run; --commit required to mutate.
+bash "$ROOT_DIR/uninstall.sh" --commit --yes >/dev/null
 [[ ! -f "$CLAUDE_HOME/commands/scaffold.md" ]] || fail "uninstall left scaffold.md"
 [[ ! -f "$CLAUDE_HOME/rules/python/fastapi.md" ]] || fail "uninstall left rules"
 pass "managed files removed"
@@ -85,6 +86,22 @@ pass "managed files removed"
 [[ "$(cat "$CLAUDE_HOME/CLAUDE.local.md")" == "$LOCAL_CONTENT" ]] || fail "uninstall touched CLAUDE.local.md"
 [[ -f "$CLAUDE_HOME/settings.local.json" ]] || fail "uninstall removed settings.local.json"
 pass "*.local.* files preserved on uninstall"
+
+echo "=== 5. resolver is shipped (find-workflow-home.sh available after install) ==="
+# Re-install and verify the resolver landed in ~/.claude/scripts/.
+bash "$ROOT_DIR/install.sh" --yes >/dev/null
+[[ -x "$CLAUDE_HOME/scripts/find-workflow-home.sh" ]] || fail "find-workflow-home.sh not installed under ~/.claude/scripts/"
+pass "find-workflow-home.sh shipped"
+
+# Resolver must succeed using only the lock's source_dir (env unset, cwd elsewhere).
+RESOLVED="$(env -u CLAUDE_WORKFLOW_HOME bash "$CLAUDE_HOME/scripts/find-workflow-home.sh" 2>&1)" \
+  || fail "resolver failed without env var; output: $RESOLVED"
+[[ -d "$RESOLVED/harness" ]] || fail "resolver returned non-workflow path: $RESOLVED"
+pass "resolver locates source via lock's source_dir"
+
+# Lock must contain the source_dir record
+grep -q '^# source_dir=' "$CLAUDE_HOME/.claude-workflow.lock" || fail "lock missing # source_dir= line"
+pass "lock records source_dir"
 
 echo
 echo "test-install.sh: ALL PASS"

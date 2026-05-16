@@ -116,12 +116,9 @@ check_subcmd() {
 # Quote handling is intentionally simple — a --no-verify token inside a single
 # quoted commit message will still trigger a deny. That false-positive is
 # considered acceptable; for nuance, use bashlex (see block-dangerous notes).
-IFS_SAVE="$IFS"
-# Replace separators with newlines, then iterate.
 SANITIZED="$(printf '%s' "$CMD" | sed -E 's/(\&\&|\|\|)/\n/g; s/[;|]/\n/g')"
 while IFS= read -r line; do
   check_subcmd "$line"
 done <<< "$SANITIZED"
-IFS="$IFS_SAVE"
 
 exit 0

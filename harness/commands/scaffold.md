@@ -24,13 +24,15 @@ argument-hint: <project-name> --stack=<cli|fastapi|nestjs|vite-react> [--desc ".
 
 1. **인자 검증**: `$ARGUMENTS` 가 위 형식을 만족하는지 확인. 부족하면 사용자에게 물어보기.
 
-2. **claude-workflow 위치 확인**: 해석 스크립트에 위임
+2. **claude-workflow 위치 확인**: 설치된 resolver 에 위임
    ```bash
-   WORKFLOW_HOME="$(bash ~/.claude/scripts/find-workflow-home.sh 2>/dev/null \
-                   || bash "$CLAUDE_WORKFLOW_HOME/scripts/find-workflow-home.sh")"
+   WORKFLOW_HOME="$(bash ~/.claude/scripts/find-workflow-home.sh)" || {
+     echo "claude-workflow 경로를 찾을 수 없습니다. CLAUDE_WORKFLOW_HOME 환경변수를 설정하세요."
+     exit 1
+   }
    ```
-   탐색 순서: `$CLAUDE_WORKFLOW_HOME` → 스크립트 자신의 부모 → `~/.claude/.claude-workflow.lock` 의 `# source_dir=` 라인.
-   모두 실패하면 사용자에게 경로 입력 요청.
+   resolver 탐색 순서: `$CLAUDE_WORKFLOW_HOME` → 스크립트 자신의 부모 → `~/.claude/.claude-workflow.lock` 의 `# source_dir=` 라인.
+   `install.sh` 가 `harness/scripts/find-workflow-home.sh` 를 `~/.claude/scripts/` 로 함께 배포하므로 항상 사용 가능.
 
 3. **doctor 실행**: 필수 도구 검증
    ```bash
