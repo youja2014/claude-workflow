@@ -34,8 +34,7 @@
 `install.sh` 가 그대로 `~/.claude/` 로 배포. 모든 프로젝트에 자동 적용:
 
 - `rules/`: 항상 적용되는 코딩 표준 (Markdown)
-- `skills/<name>/SKILL.md`: Claude가 자율 호출하는 워크플로
-- `commands/<name>.md`: 사용자가 `/foo` 로 명시적 트리거 (장기적으로 skills 로 마이그레이션 — Track C)
+- `skills/<name>/SKILL.md`: Claude가 자율 호출 + 사용자 `/<name>` 명시적 트리거 양쪽 지원 (동일 이름의 command 가 있으면 skill 이 이김 — Anthropic 공식 precedence)
 - `agents/<name>.md`: 전문 서브에이전트
 - `hooks/`: 결정적 강제 (Bash 스크립트). Windows bash 호환 + 절대 경로 (`C:/Users/youja/.claude/hooks/jq.exe` 등)
 - `scripts/`: `~/.claude/scripts/` 에 함께 배포되는 헬퍼 (예: `find-workflow-home.sh`)

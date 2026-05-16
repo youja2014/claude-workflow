@@ -32,8 +32,8 @@ bash "$ROOT_DIR/install.sh" --yes >/dev/null
 [[ -f "$CLAUDE_HOME/.claude-workflow.lock" ]] || fail "lock file not created"
 pass "lock created"
 
-[[ -f "$CLAUDE_HOME/commands/scaffold.md" ]] || fail "scaffold.md (command) not installed"
 [[ -f "$CLAUDE_HOME/skills/scaffold/SKILL.md" ]] || fail "scaffold/SKILL.md (skill) not installed"
+[[ ! -d "$CLAUDE_HOME/commands" ]] || fail "deprecated commands/ dir installed (should be skill-only now)"
 [[ -f "$CLAUDE_HOME/rules/python/fastapi.md" ]] || fail "rules not installed"
 [[ -f "$CLAUDE_HOME/hooks/format-on-save.sh" ]] || fail "hooks not installed"
 pass "harness files installed"
@@ -80,7 +80,6 @@ pass "--yes overwrites modified files (expected)"
 echo "=== 4. uninstall ==="
 # uninstall.sh defaults to dry-run; --commit required to mutate.
 bash "$ROOT_DIR/uninstall.sh" --commit --yes >/dev/null
-[[ ! -f "$CLAUDE_HOME/commands/scaffold.md" ]] || fail "uninstall left scaffold.md (command)"
 [[ ! -f "$CLAUDE_HOME/skills/scaffold/SKILL.md" ]] || fail "uninstall left scaffold/SKILL.md (skill)"
 [[ ! -f "$CLAUDE_HOME/rules/python/fastapi.md" ]] || fail "uninstall left rules"
 pass "managed files removed"

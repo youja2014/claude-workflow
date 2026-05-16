@@ -8,8 +8,8 @@ Claude Code로 개발할 때 프로젝트 시작 시점부터 워크플로우를
 
 ```
 claude-workflow/
-├── harness/      # ~/.claude/ 로 배포되는 컨텐츠 (rules, skills, commands, hooks)
-├── templates/    # /new-project 가 복사하는 스택별 보일러플레이트
+├── harness/      # ~/.claude/ 로 배포되는 컨텐츠 (rules, skills, agents, hooks)
+├── templates/    # /scaffold 가 복사하는 스택별 보일러플레이트
 └── scripts/      # 설치/검증/병합 스크립트
 ```
 
@@ -25,8 +25,8 @@ bash scripts/doctor.sh
 bash install.sh
 
 # 3. Claude Code 재시작 후 슬래시 커맨드 확인
-#    /scaffold my-api --stack=fastapi   (3-스택용; 기존 /new-project 는 _template/ 그대로)
-#    /setup-hooks
+#    /scaffold my-api --stack=fastapi          (신규 프로젝트)
+#    /scaffold                                 (기존 .git/ repo 안에서 — 컴포넌트별 옵트인 주입)
 ```
 
 ## 강제(Enforcement) 모델
@@ -70,7 +70,7 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
 
 `~/.claude/` 에는 세 부류 파일이 공존합니다:
 
-- **이 프로젝트가 관리 (스택별)**: `settings.json` 일부, `rules/python/*`, `rules/typescript/*`, `skills/`, `commands/`, `hooks/`, `agents/`
+- **이 프로젝트가 관리 (스택별)**: `settings.json` 일부, `rules/python/*`, `rules/typescript/*`, `skills/`, `hooks/`, `agents/`
 - **사용자 글로벌 (이 프로젝트가 손대지 않음)**: `CLAUDE.md`(사용자 글로벌), `rules/common/{code-quality,security,git}.md` 등 범용 룰. 사용자 책임으로 별도 관리.
 - **로컬 머신 전용 (덮어쓰기 절대 금지)**: `CLAUDE.local.md`, `settings.local.json`
 

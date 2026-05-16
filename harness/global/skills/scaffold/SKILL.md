@@ -11,6 +11,7 @@ description: |
   cookiecutter/copier 등 외부 스택 시스템 명시 요청, `.git/` 없는 dir 에서 인자 없이
   호출(이미 scaffold.sh 가 에러 처리하지만 그 전에 메시지로 안내).
 allowed-tools: [Read, Bash, Glob, Grep, AskUserQuestion]
+argument-hint: "<project-name> --stack=<cli|fastapi|nx-monorepo> [--desc=...]   |   (no args, inside an existing .git/ repo)"
 ---
 
 
@@ -21,7 +22,7 @@ allowed-tools: [Read, Bash, Glob, Grep, AskUserQuestion]
 - **신규 모드**: `<project-name>` + `--stack` 제공 → 3 스택 중 하나로 새 프로젝트 생성
 - **기존 모드**: 인자 없음 + 현재 dir 에 `.git/` 있음 → 컴포넌트별 옵트인 주입
 
-> ℹ️ 이 커맨드는 claude-workflow 의 scaffolder 입니다. 사용자의 별도 `_template/` 시스템 (있다면) 과는 무관합니다.
+> ℹ️ 이 스킬은 claude-workflow 의 scaffolder 입니다. 사용자의 별도 `_template/` 시스템 (있다면) 과는 무관합니다.
 
 ## 모드 결정 (실행 첫 단계)
 
