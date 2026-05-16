@@ -84,6 +84,17 @@ trap cleanup_on_fail EXIT
 mkdir -p "$DEST"
 ( cd "$TEMPLATE_DIR" && tar cf - --exclude=node_modules --exclude=.venv --exclude=__pycache__ --exclude=dist . ) | ( cd "$DEST" && tar xf - )
 
+# 1b. Overlay harness/project/ — stack-agnostic per-project assets shared across
+# all 3 stacks (commit-msg, pre-push, install-git-hooks.sh). Stack-specific
+# hooks (pre-commit) stay in templates/<stack>/.githooks/.
+PROJECT_OVERLAY="$ROOT_DIR/harness/project"
+if [[ -d "$PROJECT_OVERLAY" ]]; then
+  ( cd "$PROJECT_OVERLAY" && tar cf - . ) | ( cd "$DEST" && tar xf - )
+  # Ensure overlay scripts/hooks remain executable
+  chmod +x "$DEST"/.githooks/* 2>/dev/null || true
+  [[ -f "$DEST/scripts/install-git-hooks.sh" ]] && chmod +x "$DEST/scripts/install-git-hooks.sh"
+fi
+
 # 2. Rename __package__ directory if present (Python templates)
 if [[ -d "$DEST/src/__package__" ]]; then
   mv "$DEST/src/__package__" "$DEST/src/$PKG_SNAKE"
