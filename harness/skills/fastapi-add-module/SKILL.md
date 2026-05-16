@@ -1,6 +1,13 @@
 ---
 name: fastapi-add-module
-description: FastAPI 프로젝트에 새 도메인 모듈을 4-layer hexagonal-lite 구조로 추가합니다. domain → application → infrastructure → api 순으로 파일 생성 + Alembic 마이그레이션 + 단위/통합 테스트 스켈레톤 + 라우터 등록까지 자동화합니다.
+description: |
+  FastAPI 프로젝트에 새 도메인 모듈을 4-layer hexagonal-lite (domain → application → infrastructure → api)
+  구조로 생성하고 Alembic 마이그레이션, 단위/통합 테스트 스켈레톤, 라우터 등록까지 자동화한다.
+  TRIGGER when: cwd 에 `src/<pkg>/{api,application,domain,infrastructure}/` 가 모두 존재하고 사용자가
+  "새 모듈/엔티티/리소스 추가" 또는 "<X> CRUD 만들어줘" 형태로 요청.
+  SKIP when: 단일 파일 변경(엔드포인트 1개 추가), 기존 모듈 수정, Flask/Django 등 다른 웹 프레임워크,
+  도메인 레이어가 없는 단순 CRUD 스크립트.
+allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 ---
 
 # fastapi-add-module

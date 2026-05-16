@@ -1,6 +1,13 @@
 ---
 name: nestjs-add-module
-description: NestJS 프로젝트에 새 모듈(바운디드 컨텍스트)을 헥사고날 4계층 구조(domain/application/infrastructure/interface)로 추가합니다. Prisma 모델 + 마이그레이션 + DI 바인딩 + DTO + 컨트롤러 + Jest 테스트 스켈레톤까지 생성합니다.
+description: |
+  NestJS 프로젝트에 새 모듈(바운디드 컨텍스트)을 헥사고날 4계층(domain/application/infrastructure/interface)
+  으로 생성하고 Prisma 모델/마이그레이션, DI 바인딩, DTO, 컨트롤러, Jest 테스트 스켈레톤까지 만든다.
+  TRIGGER when: cwd 에 `src/modules/` 와 `prisma/schema.prisma` 가 있고 사용자가
+  "새 모듈 추가" 또는 "<X> 리소스 만들어줘" 형태로 요청.
+  SKIP when: 단일 컨트롤러/엔드포인트 추가, 기존 모듈 내부 수정, NestJS 아닌 Express/Fastify 프로젝트,
+  Prisma 없이 TypeORM/Mongoose 사용 중.
+allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 ---
 
 # nestjs-add-module

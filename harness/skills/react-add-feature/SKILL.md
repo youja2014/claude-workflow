@@ -1,6 +1,14 @@
 ---
 name: react-add-feature
-description: Vite + React 프로젝트에 새 feature 슬라이스를 Feature-Sliced Design 규칙대로 추가합니다. features/<name>/{api,model,ui} 폴더와 public API barrel, 라우트 추가, Vitest 테스트 스켈레톤까지 생성하고 FSD 의존 방향을 자동 검증합니다.
+description: |
+  Vite + React 프로젝트에 새 feature 슬라이스를 Feature-Sliced Design 규칙대로 추가한다.
+  features/<name>/{api,model,ui} + public API barrel + 라우트 + Vitest 스켈레톤을 만들고
+  FSD 의존 방향을 검증한다.
+  TRIGGER when: cwd 에 `src/{features,entities,shared}/` 가 있고 사용자가 "feature 추가"
+  또는 "<로그인/장바구니/...> 만들어줘" 형태로 요청.
+  SKIP when: 단일 컴포넌트 추가(=shared/ui), 페이지만 추가, FSD 안 쓰는 일반 React 프로젝트,
+  Next.js app-router(다른 구조 권장).
+allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 ---
 
 # react-add-feature

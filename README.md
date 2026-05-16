@@ -68,13 +68,14 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
 
 ## 로컬 / 글로벌 분리
 
-`~/.claude/` 에는 두 종류 파일이 공존합니다:
+`~/.claude/` 에는 세 부류 파일이 공존합니다:
 
-- **글로벌 (이 프로젝트가 관리)**: `CLAUDE.md`, `settings.json`, `rules/`, `skills/`, `commands/`, `hooks/`, `agents/`
-- **로컬 (사용자 머신 전용, 절대 덮어쓰지 않음)**: `CLAUDE.local.md`, `settings.local.json`
+- **이 프로젝트가 관리 (스택별)**: `settings.json` 일부, `rules/python/*`, `rules/typescript/*`, `skills/`, `commands/`, `hooks/`, `agents/`
+- **사용자 글로벌 (이 프로젝트가 손대지 않음)**: `CLAUDE.md`(사용자 글로벌), `rules/common/{code-quality,security,git}.md` 등 범용 룰. 사용자 책임으로 별도 관리.
+- **로컬 머신 전용 (덮어쓰기 절대 금지)**: `CLAUDE.local.md`, `settings.local.json`
 
-머신별 차이 (예: 회사 vs 개인, Windows vs Mac) 는 모두 `.local` 파일에 두세요.
-이 프로젝트는 글로벌만 관리하며 로컬은 사용자 소유입니다.
+즉 `harness/rules/` 에는 **스택별 룰만** 둡니다(`common/` 디렉토리 없음). 범용 룰은 사용자가 직접 작성하거나
+외부 카탈로그에서 가져와 `~/.claude/rules/common/` 에 두며, 이 프로젝트의 install/uninstall 은 그 영역을 건드리지 않습니다.
 
 ## 스택별 클린 아키텍처 요약
 
