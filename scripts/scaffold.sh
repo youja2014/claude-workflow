@@ -48,12 +48,98 @@ while [[ $# -gt 0 ]]; do
 done
 
 # ============================================================
+# Helpers shared by both modes
+# ============================================================
+sanitize_snake() { echo "$1" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_' | sed 's/__*/_/g; s/^_//; s/_$//'; }
+sanitize_kebab() { echo "$1" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed 's/--*/-/g; s/^-//; s/-$//'; }
+
+# Auto-detect stack from existing project files. Prints stack name or returns 1.
+detect_stack() {
+  local d="$1"
+  local has_py=0 has_ts=0
+  [[ -f "$d/pyproject.toml" ]] && has_py=1
+  [[ -f "$d/package.json" ]]   && has_ts=1
+  if [[ $has_py -eq 1 && $has_ts -eq 1 ]]; then
+    echo "ERROR: both pyproject.toml and package.json found — pass --stack to disambiguate" >&2
+    return 1
+  fi
+  if [[ $has_py -eq 1 ]]; then
+    if grep -qE '(^|[^a-zA-Z_])fastapi([^a-zA-Z0-9_]|$)' "$d/pyproject.toml" 2>/dev/null; then
+      echo "fastapi"
+    else
+      echo "cli"
+    fi
+    return 0
+  fi
+  if [[ $has_ts -eq 1 ]]; then
+    echo "nx-monorepo"
+    return 0
+  fi
+  return 1
+}
+
+# Extract project name from pyproject.toml or package.json. Best-effort.
+detect_project_name() {
+  local d="$1"
+  if [[ -f "$d/pyproject.toml" ]]; then
+    grep -E '^[[:space:]]*name[[:space:]]*=' "$d/pyproject.toml" 2>/dev/null \
+      | head -1 \
+      | sed -E 's/.*=[[:space:]]*"([^"]+)".*/\1/'
+  elif [[ -f "$d/package.json" ]]; then
+    grep -E '"name"[[:space:]]*:' "$d/package.json" 2>/dev/null \
+      | head -1 \
+      | sed -E 's/.*"name"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/'
+  fi
+}
+
+resolve_template_dir() {
+  case "$1" in
+    cli)         echo "$TEMPLATES_DIR/python-cli" ;;
+    fastapi)     echo "$TEMPLATES_DIR/python-fastapi" ;;
+    nx-monorepo) echo "$TEMPLATES_DIR/ts-nx" ;;
+    *) return 1 ;;
+  esac
+}
+
+# ============================================================
 # MODE: existing (adopt claude-workflow into existing repo)
 # ============================================================
 if [[ "$MODE" == "existing" ]]; then
   [[ -z "$COMPONENTS" ]] && { echo "ERROR: --components required in existing mode" >&2; exit 2; }
   DEST="${DEST:-$(pwd)}"
   [[ -d "$DEST/.git" ]] || { echo "ERROR: --dest must contain .git/ (got: $DEST)" >&2; exit 1; }
+
+  # Detect which components need stack/name resolution
+  IFS=',' read -ra COMP_LIST <<< "$COMPONENTS"
+  needs_stack=0
+  needs_name=0
+  for comp in "${COMP_LIST[@]}"; do
+    case "$comp" in
+      githooks-stack)   needs_stack=1 ;;
+      makefile)         needs_stack=1; needs_name=1 ;;
+    esac
+  done
+
+  if [[ $needs_stack -eq 1 ]]; then
+    if [[ -z "$STACK" ]]; then
+      STACK="$(detect_stack "$DEST")" \
+        || { echo "ERROR: stack auto-detect failed; pass --stack <cli|fastapi|nx-monorepo>" >&2; exit 1; }
+      echo "[scaffold-existing] detected stack: $STACK"
+    fi
+    TEMPLATE_DIR="$(resolve_template_dir "$STACK")" \
+      || { echo "ERROR: unknown --stack $STACK (cli|fastapi|nx-monorepo)" >&2; exit 2; }
+    [[ -d "$TEMPLATE_DIR" ]] || { echo "ERROR: template not found: $TEMPLATE_DIR" >&2; exit 1; }
+  fi
+
+  if [[ $needs_name -eq 1 ]]; then
+    if [[ -z "$NAME" ]]; then
+      NAME="$(detect_project_name "$DEST" 2>/dev/null || true)"
+      [[ -n "$NAME" ]] && echo "[scaffold-existing] detected project name: $NAME"
+    fi
+    NAME="${NAME:-existing-project}"
+    PKG_SNAKE="$(sanitize_snake "$NAME")"
+    PKG_KEBAB="$(sanitize_kebab "$NAME")"
+  fi
 
   installed=()
   skipped=()
@@ -77,7 +163,29 @@ if [[ "$MODE" == "existing" ]]; then
     installed+=("$dst")
   }
 
-  IFS=',' read -ra COMP_LIST <<< "$COMPONENTS"
+  install_file_subst() {
+    local src="$1" dst="$2"
+    if [[ ! -f "$src" ]]; then
+      echo "ERROR: source not found: $src" >&2
+      exit 1
+    fi
+    if [[ -e "$dst" ]]; then
+      skipped+=("$dst")
+      return
+    fi
+    mkdir -p "$(dirname "$dst")"
+    if [[ "$DRY_RUN" == "1" ]]; then
+      echo "[dry] install (subst): $dst <- $src"
+    else
+      sed -e "s|__package__|$PKG_SNAKE|g" \
+          -e "s|__project_kebab__|$PKG_KEBAB|g" \
+          -e "s|__project_name__|$NAME|g" \
+          -e "s|__description__|${DESC:-$NAME}|g" \
+          "$src" > "$dst"
+    fi
+    installed+=("$dst")
+  }
+
   for comp in "${COMP_LIST[@]}"; do
     case "$comp" in
       githooks-universal)
@@ -89,9 +197,16 @@ if [[ "$MODE" == "existing" ]]; then
         install_file "$PROJECT_OVERLAY/scripts/install-git-hooks.sh" "$DEST/scripts/install-git-hooks.sh"
         chmod +x "$DEST/scripts/install-git-hooks.sh" 2>/dev/null || true
         ;;
+      githooks-stack)
+        install_file "$TEMPLATE_DIR/.githooks/pre-commit" "$DEST/.githooks/pre-commit"
+        chmod +x "$DEST/.githooks/pre-commit" 2>/dev/null || true
+        ;;
+      makefile)
+        install_file_subst "$TEMPLATE_DIR/Makefile" "$DEST/Makefile"
+        ;;
       *)
         echo "ERROR: unknown component: $comp" >&2
-        echo "Available: githooks-universal, install-script" >&2
+        echo "Available: githooks-universal, githooks-stack, install-script, makefile" >&2
         exit 2
         ;;
     esac
@@ -125,10 +240,7 @@ DEST="${DEST:-$(pwd)/$NAME}"
 [[ -e "$DEST" ]] && { echo "ERROR: destination exists: $DEST" >&2; exit 1; }
 
 # Compute package/identifier names from project name
-# python: snake_case, ts: kebab-case (npm name)
-sanitize_snake() { echo "$1" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_' | sed 's/__*/_/g; s/^_//; s/_$//'; }
-sanitize_kebab() { echo "$1" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed 's/--*/-/g; s/^-//; s/-$//'; }
-
+# python: snake_case, ts: kebab-case (npm name). Helpers defined near top.
 PKG_SNAKE="$(sanitize_snake "$NAME")"
 PKG_KEBAB="$(sanitize_kebab "$NAME")"
 
