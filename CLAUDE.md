@@ -4,7 +4,9 @@
 
 ## 정체성
 
-- **목적**: Claude Code 사용자가 새 프로젝트를 시작할 때 워크플로우(폴더 구조, 클린 아키텍처, lint/test/typecheck, pre-commit)를 강제하는 시스템
+- **목적**: Claude Code 사용자의 워크플로우(폴더 구조, 클린 아키텍처, lint/test/typecheck, git hook, Docker) / 코딩 컨벤션 / 도구 강제 시스템을 구축하고, **신규 프로젝트뿐 아니라 기존 프로젝트에도 안전하게 적용 가능하게** 만드는 메타 시스템.
+- **1차 산출물**: `harness/` (글로벌 ~/.claude/ 에 배포) + `scripts/` (설치/적용/머지). `templates/` 는 **검증 sandbox + 참고용 reference repo** (1차 산출물 아님).
+- **진입점**: `/scaffold` — 대상 디렉토리 상태로 신규/기존 자동 감지. 신규는 templates 복사, 기존은 컴포넌트별 옵트인 주입. (옛 `/new-project` 는 deprecation 대상 — Track A 에서 전환)
 - **타깃 스택**: Python(uv) CLI/FastAPI, TypeScript(yarn) Nx 모노레포(NestJS API + Vite+React Web)
 - **타깃 OS**: Windows 11 + bash + Docker
 - **언어**: 사용자 응답 한국어, 파일/코드/주석은 영어
@@ -79,6 +81,19 @@ PR/커밋 전에 반드시:
 3. **로컬 검증**: `bash install.sh --dry-run` 으로 install 결과 확인
 4. **템플릿 검증**: 수정한 템플릿이 실제로 `cd templates/<stack> && make lint && make typecheck && make test` 통과
 5. **결정 기록**: 트레이드오프가 있는 결정은 `harness/rules/` 또는 `README.md` 에 한 줄로 기록
+
+## Claude Code 설정 우선순위 (공식 규칙)
+
+Claude Code 는 설정 출처별 우선순위가 정해져 있음. 같은 이름의 skill / agent / command / hook 이 여러 출처에 있으면 **상위 출처가 이김**:
+
+1. **Enterprise** (조직 강제 설정) — 가장 강함
+2. **Personal** (`~/.claude/`) — 사용자 글로벌. **이 프로젝트의 1차 배포 대상.**
+3. **Project** (`.claude/`) — 프로젝트별. 옵트인 주입.
+
+**주의**: 이 규칙은 **Cursor 와 반대** (Cursor 는 Project > User). Cursor 출신 사용자는 "프로젝트 규칙이 글로벌을 덮을 것" 이라 기대하지만 Claude Code 에선 반대. 설계 시:
+- 글로벌만 설치된 상태에서도 모든 워크플로가 동작해야 함 (프로젝트 컨텐츠는 항상 옵트인)
+- 프로젝트 특화 규칙이 글로벌을 덮어야 한다면 **이름을 다르게** 짓거나 `plugin:<name>:` 네임스페이스 활용
+- 사용자가 글로벌·프로젝트 분할 결정 시 이 우선순위를 명시적으로 안내
 
 ## 절대 하지 말 것
 
