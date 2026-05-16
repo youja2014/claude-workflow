@@ -1,0 +1,22 @@
+{
+  "name": "claude-workflow",
+  "version": "0.1.0-poc",
+  "description": "Harness engineering meta-system. Skills, sub-agents, hooks, and slash commands for Claude Code. Installable as a plugin (PoC) or via this repo's install.sh (canonical path — see ADR-002).",
+  "author": {
+    "name": "youja2005",
+    "email": "youja2005@gmail.com"
+  },
+  "homepage": "https://github.com/youja2005/claude-workflow",
+  "repository": "https://github.com/youja2005/claude-workflow",
+  "license": "MIT",
+  "keywords": [
+    "python",
+    "typescript",
+    "nx",
+    "clean-architecture",
+    "tdd",
+    "harness",
+    "windows",
+    "docker"
+  ]
+}

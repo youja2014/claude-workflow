@@ -17,6 +17,7 @@
 - `harness/project/` — **프로젝트 옵트인** 주입용 자산. `/scaffold` 가 신규 scaffold 또는 기존 프로젝트 adoption 시 복사. 현재 내용: stack-agnostic 공통 git hooks (`commit-msg`, `pre-push`) + `install-git-hooks.sh`. 스택별 자산은 여기 두지 말 것 — 그건 `templates/<stack>/` 책임.
 - `templates/` — 스택별 **검증 sandbox + reference repo**. `/scaffold` 가 신규 프로젝트 복사 원본으로 사용. 각 템플릿은 독립적으로 빌드 가능해야 함 (`make lint && make typecheck && make test && make docker-build`).
 - `scripts/` — 설치/scaffold/검증/머지 로직. Windows bash에서 동작 보장.
+- `.claude-plugin/plugin.json` — Claude Code 플러그인 매니페스트 (PoC, 비활성). 현재 canonical 설치 경로는 `install.sh`. 결정 근거는 메모리 ADR-002 (`project_plugin_packaging.md`).
 
 ## 작성 규칙
 
