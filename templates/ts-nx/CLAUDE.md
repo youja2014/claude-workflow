@@ -7,6 +7,10 @@
 - **apps/web**: Vite + React 19 SPA (포트 5173)
 - **libs/shared-types**: 양쪽이 import 하는 공유 타입 (`HealthStatus` 등)
 
+## 문서 위치
+
+이 `CLAUDE.md` 는 *광역 불변 정책* (의존 방향, 절대 하지 말 것, DoD)만 둡니다. 변화하는 정보(계획/현황/의사결정/인계) 와 영역별 가이드는 `docs/` 에서 관리합니다. 진입점: [`docs/README.md`](./docs/README.md).
+
 ## 구조
 
 ```
