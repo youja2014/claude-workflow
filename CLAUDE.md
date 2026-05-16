@@ -55,6 +55,7 @@
 - BREAKING change: `<type>(<scope>)!: ...` + 본문에 `BREAKING CHANGE: <설명>` 한 줄
 - 본문: "왜" 위주로 1-2 단락. "what" 은 diff가 말함
 - WIP/squash-me 커밋 금지 — 작업 완료 후 단일 논리 변경으로 커밋
+- 강제: `.githooks/commit-msg` 가 subject 정규식을 검증 (`bash scripts/install-git-hooks.sh` 로 활성화). `--no-verify` 우회는 의도적인 사람만 사용 — Claude 는 절대 사용 금지(`harness/hooks/block-dangerous.sh` 가 차단)
 
 ### Semantic Versioning (해석 규칙)
 

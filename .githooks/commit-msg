@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# commit-msg — Enforce Conventional Commits format on the commit subject.
+#
+# Installed via:  bash scripts/install-git-hooks.sh
+# Bypass (humans, intentional only):  git commit --no-verify
+#
+# See CLAUDE.md "Commit & Versioning" section for the canonical rules.
+
+set -uo pipefail
+
+msg_file="${1:-}"
+[[ -z "$msg_file" || ! -f "$msg_file" ]] && exit 0
+
+subject="$(head -n1 "$msg_file")"
+
+# Allow auto-generated commits that git creates with fixed prefixes.
+case "$subject" in
+  "Merge "*|"Revert "*|"fixup! "*|"squash! "*|"amend! "*) exit 0 ;;
+esac
+
+# Allowed types must match CLAUDE.md's "Commit & Versioning" list.
+# Form: <type>(<scope>)!?: <subject>
+pattern='^(feat|fix|docs|refactor|test|chore|perf|ci)(\([^)]+\))?!?: .+'
+
+if [[ ! "$subject" =~ $pattern ]]; then
+  cat >&2 <<EOF
+[commit-msg] subject does not match Conventional Commits:
+  $subject
+
+required: <type>(<scope>)!?: <description>
+  type  = feat | fix | docs | refactor | test | chore | perf | ci
+  scope = optional, in parens (e.g. templates/ts-nx, harness, scripts)
+  !     = optional, indicates a BREAKING change (also add 'BREAKING CHANGE:' line in body)
+
+examples:
+  fix(templates/ts-nx): add postgres healthcheck for race
+  feat(harness): add new SKILL for X
+  feat(templates)!: drop legacy stacks
+
+see CLAUDE.md "Commit & Versioning" for full rules.
+to bypass (do not use for normal commits):  git commit --no-verify
+EOF
+  exit 1
+fi
+
+if (( ${#subject} > 70 )); then
+  echo "[commit-msg] WARN: subject is ${#subject} chars (recommended <= 70)" >&2
+fi
+
+exit 0
