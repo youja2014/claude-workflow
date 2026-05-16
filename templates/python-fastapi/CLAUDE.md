@@ -62,7 +62,7 @@ src/__package__/
 - 라우터 함수에 비즈니스 로직 (use case로 위임)
 - 글로벌 `engine = create_engine(...)` — lifespan에서 관리
 - `pyproject.toml` 직접 편집 (`uv add` / `uv remove` 사용)
-- `--no-verify` pre-commit 우회
+- `--no-verify` 로 git hook 우회 (`.githooks/commit-msg`, `pre-commit`, `pre-push`)
 
 ## 주요 명령
 

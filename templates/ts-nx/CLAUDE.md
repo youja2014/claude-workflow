@@ -65,7 +65,7 @@ yarn nx g @nx/js:lib libs/<name> --tags=scope:<api|web|shared>,type:<feature|uti
 - `project.json` 의 `tags` 누락 (boundary 검사 우회로 이어짐)
 - 한 프로젝트가 다른 프로젝트 디렉토리를 상대경로(`../../apps/...`)로 import — 반드시 `@<project>/<lib>` 워크스페이스 path
 - npm 사용 (yarn 전용)
-- `--no-verify` husky 우회
+- `--no-verify` 로 git hook 우회 (`.githooks/commit-msg`, `pre-commit`, `pre-push`)
 - `libs/shared-types` 에 런타임 코드 추가 (타입/인터페이스 전용 유지). 런타임 값 공유가 필요하면 `libs/shared-utils` 같은 새 라이브러리를 만들고 해당 app `package.json` 의 `dependencies` 에 추가할 것. 이유: shared-types는 컴파일 타임에 erase 되므로 api `devDependencies` 에만 두어 Nx 의 `generatePackageJson` 이 `workspace:*` 를 production 의존성에 포함하지 않게 함.
 
 ## 주요 명령

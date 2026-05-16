@@ -45,7 +45,7 @@ src/__package__/
 
 - `core/` 에서 `typer`, `requests`, `httpx`, DB 라이브러리 import
 - `core/` 에서 `print` 호출 (출력은 `commands/` 에서)
-- `--no-verify` 로 pre-commit 우회
+- `--no-verify` 로 git hook 우회 (`.githooks/commit-msg`, `pre-commit`, `pre-push`)
 - `pyproject.toml` 직접 편집 (`uv add` / `uv remove` 사용)
 
 ## 주요 명령

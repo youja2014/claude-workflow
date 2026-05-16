@@ -172,18 +172,20 @@ case "$LANG" in
   python)
     echo "[scaffold] python post-init"
     ( cd "$DEST" && uv sync --quiet || echo "[scaffold] uv sync skipped (run manually)" )
-    ( cd "$DEST" && command -v pre-commit >/dev/null && pre-commit install -q || \
-        uvx --quiet pre-commit install || \
-        echo "[scaffold] pre-commit install skipped (run: uvx pre-commit install)" ) 2>/dev/null || true
     ;;
   ts)
     echo "[scaffold] typescript post-init"
     if [[ -f "$DEST/package.json" ]]; then
       ( cd "$DEST" && corepack enable 2>/dev/null; yarn install --silent || echo "[scaffold] yarn install skipped (run manually)" )
-      ( cd "$DEST" && yarn run prepare 2>/dev/null || echo "[scaffold] husky prepare skipped (run: yarn run prepare)" )
     fi
     ;;
 esac
+
+# Install local git hooks (vendor-neutral, applies to all stacks)
+if [[ -f "$DEST/scripts/install-git-hooks.sh" ]]; then
+  ( cd "$DEST" && bash scripts/install-git-hooks.sh >/dev/null 2>&1 \
+    || echo "[scaffold] git hooks install skipped (run: bash scripts/install-git-hooks.sh)" )
+fi
 
 echo
 echo "[scaffold] done. next steps:"

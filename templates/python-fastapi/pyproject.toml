@@ -30,7 +30,6 @@ dev = [
     "pytest-cov>=5.0",
     "ruff>=0.8",
     "pyright>=1.1.390",
-    "pre-commit>=4.0",
     "factory-boy>=3.3",
     "testcontainers[postgres]>=4.8",
 ]

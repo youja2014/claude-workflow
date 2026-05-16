@@ -1,8 +1,9 @@
-.PHONY: help install doctor lint format typecheck test test-unit test-integration test-e2e run migrate-rev migrate-up docker-build docker-up docker-down clean
+.PHONY: help install install-git-hooks doctor lint format typecheck test test-unit test-integration test-e2e verify run migrate-rev migrate-up docker-build docker-up docker-down clean
 
 help:
 	@echo "Targets:"
-	@echo "  install            uv sync + pre-commit install"
+	@echo "  install            uv sync + install local git hooks"
+	@echo "  install-git-hooks  point core.hooksPath to .githooks/"
 	@echo "  doctor             verify tooling"
 	@echo "  lint               ruff check"
 	@echo "  format             ruff format + check --fix"
@@ -11,6 +12,7 @@ help:
 	@echo "  test-unit          unit only"
 	@echo "  test-integration   integration only (needs docker)"
 	@echo "  test-e2e           e2e only"
+	@echo "  verify             lint + typecheck + (unit + e2e tests; used by pre-push)"
 	@echo "  run                run dev server"
 	@echo "  migrate-rev        alembic revision --autogenerate -m MSG"
 	@echo "  migrate-up         alembic upgrade head"
@@ -20,8 +22,13 @@ help:
 
 install:
 	uv sync
-	uv run pre-commit install
-	uv run pre-commit install --hook-type commit-msg
+	bash scripts/install-git-hooks.sh
+
+install-git-hooks:
+	bash scripts/install-git-hooks.sh
+
+verify: lint typecheck
+	uv run pytest -m "unit or e2e"
 
 doctor:
 	@command -v uv >/dev/null || (echo "uv missing" && exit 1)

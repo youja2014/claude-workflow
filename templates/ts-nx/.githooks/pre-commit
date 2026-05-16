@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# pre-commit — Format & lint staged TS/JS/JSON/MD files + light safety checks.
+#
+# Installed via:  bash scripts/install-git-hooks.sh  (or `make install-git-hooks`)
+# Bypass (humans, intentional only):  git commit --no-verify
+
+set -uo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx|cjs|mjs|json|md|yaml|yml|css|html)$' || true)
+
+if [[ -n "$staged" ]]; then
+  echo "[pre-commit] prettier --write..."
+  echo "$staged" | xargs --no-run-if-empty yarn prettier --write 2>/dev/null \
+    || { echo "[pre-commit] prettier failed"; exit 1; }
+
+  ts_staged=$(echo "$staged" | grep -E '\.(ts|tsx|js|jsx|cjs|mjs)$' || true)
+  if [[ -n "$ts_staged" ]]; then
+    echo "[pre-commit] eslint --fix..."
+    echo "$ts_staged" | xargs --no-run-if-empty yarn eslint --fix \
+      || { echo "[pre-commit] eslint found unfixable issues"; exit 1; }
+  fi
+
+  # Re-stage auto-fixed
+  echo "$staged" | xargs --no-run-if-empty git add
+fi
+
+# Light safety checks (cheap, always run on staged content)
+all_staged=$(git diff --cached --name-only --diff-filter=ACM)
+if [[ -n "$all_staged" ]]; then
+  # merge conflict markers in staged content
+  if git diff --cached -U0 | grep -Eq '^\+(<{7}|={7}|>{7}) '; then
+    echo "[pre-commit] merge conflict markers in staged content" >&2; exit 1
+  fi
+  # private key content
+  if git diff --cached -U0 | grep -Eq '(BEGIN RSA PRIVATE|BEGIN OPENSSH PRIVATE|BEGIN PGP PRIVATE|BEGIN DSA PRIVATE|BEGIN EC PRIVATE)'; then
+    echo "[pre-commit] private key content detected in staged diff" >&2; exit 1
+  fi
+  # large files (>500kb)
+  while IFS= read -r f; do
+    [[ -z "$f" || ! -f "$f" ]] && continue
+    size=$(wc -c <"$f" 2>/dev/null || echo 0)
+    if (( size > 512000 )); then
+      echo "[pre-commit] $f is $((size/1024))kb (>500kb)" >&2; exit 1
+    fi
+  done <<< "$all_staged"
+fi
+
+exit 0

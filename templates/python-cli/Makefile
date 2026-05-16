@@ -1,23 +1,29 @@
-.PHONY: help install doctor lint format typecheck test test-cov run docker-build docker-up docker-down clean
+.PHONY: help install install-git-hooks doctor lint format typecheck test test-cov verify run docker-build docker-up docker-down clean
 
 help:
 	@echo "Targets:"
-	@echo "  install       uv sync + pre-commit install"
-	@echo "  doctor        verify tooling"
-	@echo "  lint          ruff check"
-	@echo "  format        ruff format"
-	@echo "  typecheck     pyright"
-	@echo "  test          pytest"
-	@echo "  test-cov      pytest with coverage"
-	@echo "  run           run CLI (pass ARGS=...)"
-	@echo "  docker-build  build docker image"
-	@echo "  docker-up     docker compose up"
-	@echo "  docker-down   docker compose down"
+	@echo "  install            uv sync + install local git hooks"
+	@echo "  install-git-hooks  point core.hooksPath to .githooks/"
+	@echo "  doctor             verify tooling"
+	@echo "  lint               ruff check"
+	@echo "  format             ruff format"
+	@echo "  typecheck          pyright"
+	@echo "  test               pytest"
+	@echo "  test-cov           pytest with coverage"
+	@echo "  verify             lint + typecheck + test (used by pre-push)"
+	@echo "  run                run CLI (pass ARGS=...)"
+	@echo "  docker-build       build docker image"
+	@echo "  docker-up          docker compose up"
+	@echo "  docker-down        docker compose down"
 
 install:
 	uv sync
-	uv run pre-commit install
-	uv run pre-commit install --hook-type commit-msg
+	bash scripts/install-git-hooks.sh
+
+install-git-hooks:
+	bash scripts/install-git-hooks.sh
+
+verify: lint typecheck test
 
 doctor:
 	@command -v uv >/dev/null || (echo "uv not installed" && exit 1)
