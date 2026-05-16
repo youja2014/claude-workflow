@@ -56,6 +56,16 @@ bash install.sh --dry-run    # 무엇이 변경될지 출력만
 bash uninstall.sh            # 설치한 파일만 제거, 로컬 오버라이드는 유지
 ```
 
+## 검증 (CI 없이 강제)
+
+```bash
+make verify           # = make test (test-install + test-templates)
+make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 verify
+```
+
+`make verify` 는 vendor-neutral. 외부 러너가 필요해지면 한 줄짜리 워크플로(`run: make verify`) 로
+어디든(GitHub Actions, GitLab CI, Forgejo, 셀프호스트 act 등) 동일하게 동작합니다.
+
 ## 로컬 / 글로벌 분리
 
 `~/.claude/` 에는 두 종류 파일이 공존합니다:

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# pre-push — Block push when 'make verify' fails.
+#
+# Installed via:  bash scripts/install-git-hooks.sh
+# Bypass:         not via --no-verify (banned by harness/hooks/block-dangerous.sh
+#                 inside Claude Code; humans can use it intentionally).
+
+set -uo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+echo "[pre-push] running 'make verify' ..."
+if ! make verify; then
+  echo "[pre-push] verify FAILED — push aborted." >&2
+  echo "[pre-push] fix the failures or run 'git push --no-verify' deliberately." >&2
+  exit 1
+fi
+
+echo "[pre-push] verify OK — proceeding."
+exit 0
