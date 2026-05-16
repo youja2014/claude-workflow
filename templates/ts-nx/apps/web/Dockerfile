@@ -8,6 +8,7 @@ RUN corepack enable
 
 FROM base AS deps
 COPY package.json yarn.lock .yarnrc.yml ./
+COPY apps/api/package.json apps/api/package.json
 COPY apps/web/package.json apps/web/package.json
 COPY libs/shared-types/package.json libs/shared-types/package.json
 RUN yarn install --immutable
