@@ -13,9 +13,10 @@
 
 ## 디렉토리 책임
 
-- `harness/` — `~/.claude/` 에 배포되는 컨텐츠. 글로벌 영향. 수정 시 신중.
-- `templates/` — `/new-project` 가 복사하는 스택별 보일러플레이트. 각 템플릿은 독립적으로 빌드 가능해야 함.
-- `scripts/` — 설치/검증/머지 로직. Windows bash에서 동작 보장.
+- `harness/global/` — `~/.claude/` 에 배포되는 **글로벌** 컨텐츠. 모든 프로젝트 자동 적용. 사용자 절대 원칙: 범용 rules, 보안 hook, 범용 agent/skill/slash command. 수정 시 신중 (글로벌 영향).
+- `harness/project/` — **프로젝트 옵트인** 주입용 자산. `/scaffold` 가 신규 scaffold 또는 기존 프로젝트 adoption 시 복사. 현재 내용: stack-agnostic 공통 git hooks (`commit-msg`, `pre-push`) + `install-git-hooks.sh`. 스택별 자산은 여기 두지 말 것 — 그건 `templates/<stack>/` 책임.
+- `templates/` — 스택별 **검증 sandbox + reference repo**. `/scaffold` 가 신규 프로젝트 복사 원본으로 사용. 각 템플릿은 독립적으로 빌드 가능해야 함 (`make lint && make typecheck && make test && make docker-build`).
+- `scripts/` — 설치/scaffold/검증/머지 로직. Windows bash에서 동작 보장.
 
 ## 작성 규칙
 
@@ -27,13 +28,26 @@
 - 각 템플릿은 빌드 검증 가능: `make doctor && make install && make lint && make typecheck && make test && make docker-build` 모두 통과해야 함
 - `.dockerignore` 필수, multi-stage Dockerfile, root 비실행
 
-### 하네스 (harness/*)
+### 하네스 — 글로벌 (`harness/global/*`)
+
+`install.sh` 가 그대로 `~/.claude/` 로 배포. 모든 프로젝트에 자동 적용:
 
 - `rules/`: 항상 적용되는 코딩 표준 (Markdown)
 - `skills/<name>/SKILL.md`: Claude가 자율 호출하는 워크플로
-- `commands/<name>.md`: 사용자가 `/foo` 로 명시적 트리거
+- `commands/<name>.md`: 사용자가 `/foo` 로 명시적 트리거 (장기적으로 skills 로 마이그레이션 — Track C)
+- `agents/<name>.md`: 전문 서브에이전트
 - `hooks/`: 결정적 강제 (Bash 스크립트). Windows bash 호환 + 절대 경로 (`C:/Users/youja/.claude/hooks/jq.exe` 등)
+- `scripts/`: `~/.claude/scripts/` 에 함께 배포되는 헬퍼 (예: `find-workflow-home.sh`)
 - `settings.json`: `~/.claude/settings.json` 에 머지될 조각 (`scripts/settings-merge.py` 가 안전 머지). 중복 hook 등록 금지
+
+### 하네스 — 프로젝트 (`harness/project/*`)
+
+`/scaffold` 가 신규 프로젝트 생성 또는 기존 프로젝트 adoption 시 대상 디렉토리로 복사. 옵트인:
+
+- `.githooks/`: stack-agnostic 공통 git hooks (`commit-msg`, `pre-push`). 스택별 훅(`pre-commit` — Python/TS 도구 다름) 은 `templates/<stack>/.githooks/` 에 남음
+- `scripts/install-git-hooks.sh`: stack-agnostic git hooks 활성화 스크립트
+
+**원칙**: 모든 스택에 동일한 컨텐츠만 여기 둠. 스택별 변형이 필요하면 `templates/<stack>/` 쪽.
 
 ### 스크립트 (scripts/*)
 
