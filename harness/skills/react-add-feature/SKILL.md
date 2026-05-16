@@ -14,14 +14,14 @@ allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 
 # react-add-feature
 
-Vite + React 프로젝트(`templates/ts-vite-react` 단일 SPA 또는 `templates/ts-nx` 모노레포의 `apps/web`)에 새 feature 슬라이스를 추가합니다.
+Vite + React 프로젝트(`templates/ts-nx` 모노레포의 `apps/web` 또는 동등한 단일 SPA)에 새 feature 슬라이스를 추가합니다.
 
 ## 적용 조건
 
 다음 둘 중 하나의 **앱 루트**(`$APP_ROOT`)를 결정한 뒤 진행:
 
-- 단일 SPA: `$APP_ROOT = .` — `src/features/`, `src/entities/`, `src/shared/` 존재
 - Nx 모노레포: `$APP_ROOT = apps/web` — `apps/web/src/features/`, `apps/web/src/entities/`, `apps/web/src/shared/` 존재
+- 단일 SPA(외부): `$APP_ROOT = .` — `src/features/`, `src/entities/`, `src/shared/` 존재
 
 공통:
 
@@ -115,18 +115,18 @@ grep -r "from '@/features" src/features/<name>/ --include='*.ts*' \
 
 ## 완료 후 검증
 
-단일 SPA:
-```bash
-yarn lint --fix
-yarn typecheck
-yarn test src/features/<name>
-```
-
 Nx 모노레포:
 ```bash
 yarn nx lint web --fix
 yarn nx typecheck web
 yarn nx test web --testFile=features/<name>
+```
+
+단일 SPA(외부):
+```bash
+yarn lint --fix
+yarn typecheck
+yarn test src/features/<name>
 ```
 
 Nx 의 경우 FSD 위반은 `fsd-violation-detector` 에이전트로 별도 검사 (Nx tags 와 다른 층위). 새 feature 를 라이브러리(`libs/<name>`)로 분리한다면 `project.json` 에 `tags: ["scope:web", "type:feature"]` 를 명시해야 `@nx/enforce-module-boundaries` 가 동작한다.

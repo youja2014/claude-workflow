@@ -1,7 +1,7 @@
 # claude-workflow
 
 Claude Code로 개발할 때 프로젝트 시작 시점부터 워크플로우를 강제하는 메타 프로젝트입니다.
-4개 스택 (Python CLI, Python FastAPI, TypeScript NestJS, TypeScript Vite+React)에 대한
+3개 스택 (Python CLI, Python FastAPI, TypeScript Nx 모노레포 = NestJS API + Vite+React Web)에 대한
 보일러플레이트와 `~/.claude/` 하네스 확장 컨텐츠를 한 곳에서 관리합니다.
 
 ## 구성
@@ -25,7 +25,7 @@ bash scripts/doctor.sh
 bash install.sh
 
 # 3. Claude Code 재시작 후 슬래시 커맨드 확인
-#    /scaffold my-api --stack=fastapi   (4-스택용; 기존 /new-project 는 _template/ 그대로)
+#    /scaffold my-api --stack=fastapi   (3-스택용; 기존 /new-project 는 _template/ 그대로)
 #    /setup-hooks
 ```
 
@@ -81,8 +81,11 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
 
 - **Python CLI** (`templates/python-cli`): `commands → core ← adapters` (3-layer lite)
 - **Python FastAPI** (`templates/python-fastapi`): `api → application → domain ← infrastructure` (4-layer hexagonal-lite)
-- **TypeScript NestJS** (`templates/ts-nestjs`): 모듈 = 바운디드 컨텍스트, 내부 4계층 + Prisma + 3종 엔티티 분리
-- **TypeScript Vite+React** (`templates/ts-vite-react`): Feature-Sliced Design lite (`app→pages→widgets→features→entities→shared`)
+- **TypeScript Nx 모노레포** (`templates/ts-nx`):
+  - `apps/api` — NestJS, 모듈 = 바운디드 컨텍스트, 내부 4계층 + Prisma + 3종 엔티티 분리
+  - `apps/web` — Vite+React, Feature-Sliced Design lite (`app→pages→widgets→features→entities→shared`)
+  - `libs/shared-types` — 공유 타입
+  - 프로젝트 간 경계는 `@nx/enforce-module-boundaries` (project.json `tags`) 로 자동 강제
 
 자세한 룰은 `harness/rules/` 참조.
 

@@ -5,7 +5,7 @@
 ## 정체성
 
 - **목적**: Claude Code 사용자가 새 프로젝트를 시작할 때 워크플로우(폴더 구조, 클린 아키텍처, lint/test/typecheck, pre-commit)를 강제하는 시스템
-- **타깃 스택**: Python(uv) CLI/FastAPI, TypeScript(yarn) NestJS/Vite+React
+- **타깃 스택**: Python(uv) CLI/FastAPI, TypeScript(yarn) Nx 모노레포(NestJS API + Vite+React Web)
 - **타깃 OS**: Windows 11 + bash + Docker
 - **언어**: 사용자 응답 한국어, 파일/코드/주석은 영어
 

@@ -71,17 +71,9 @@ run_typescript() {
       || { mark_fail "$stack" "eslint failed"; return; }
     mark_pass "$stack (full)"
   else
-    # Different templates have different required surface files.
-    local required
-    case "$stack" in
-      nx-monorepo)
-        required=("package.json" "nx.json" "tsconfig.base.json" "eslint.config.mjs" \
-                  "apps/api/project.json" "apps/web/project.json" "libs/shared-types/project.json")
-        ;;
-      *)
-        required=("package.json" "tsconfig.json" "Dockerfile" ".husky/pre-commit")
-        ;;
-    esac
+    # Required surface files for the TS Nx monorepo template.
+    local required=("package.json" "nx.json" "tsconfig.base.json" "eslint.config.mjs" \
+                    "apps/api/project.json" "apps/web/project.json" "libs/shared-types/project.json")
     for f in "${required[@]}"; do
       [[ -f "$dest/$f" ]] || { mark_fail "$stack" "missing $f"; return; }
     done
@@ -91,8 +83,6 @@ run_typescript() {
 
 run_python cli
 run_python fastapi
-run_typescript nestjs
-run_typescript vite-react
 run_typescript nx-monorepo
 
 echo

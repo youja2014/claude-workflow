@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # scaffold.sh — Create a new project from a template.
 #
-# Called by /new-project command or directly:
-#   bash scripts/scaffold.sh --stack <cli|fastapi|nestjs|vite-react> --name <project> [--dest <dir>] [--desc "..."]
+# Called by /scaffold command or directly:
+#   bash scripts/scaffold.sh --stack <cli|fastapi|nx-monorepo> --name <project> [--dest <dir>] [--desc "..."]
 
 set -euo pipefail
 
@@ -29,16 +29,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-[[ -z "$STACK" ]] && { echo "ERROR: --stack required (cli|fastapi|nestjs|vite-react)" >&2; exit 2; }
+[[ -z "$STACK" ]] && { echo "ERROR: --stack required (cli|fastapi|nx-monorepo)" >&2; exit 2; }
 [[ -z "$NAME"  ]] && { echo "ERROR: --name required" >&2; exit 2; }
 
 case "$STACK" in
   cli)         TEMPLATE_DIR="$TEMPLATES_DIR/python-cli"; LANG="python" ;;
   fastapi)     TEMPLATE_DIR="$TEMPLATES_DIR/python-fastapi"; LANG="python" ;;
-  nestjs)      TEMPLATE_DIR="$TEMPLATES_DIR/ts-nestjs"; LANG="ts" ;;
-  vite-react)  TEMPLATE_DIR="$TEMPLATES_DIR/ts-vite-react"; LANG="ts" ;;
   nx-monorepo) TEMPLATE_DIR="$TEMPLATES_DIR/ts-nx"; LANG="ts" ;;
-  *) echo "ERROR: unknown --stack $STACK (cli|fastapi|nestjs|vite-react|nx-monorepo)" >&2; exit 2 ;;
+  *) echo "ERROR: unknown --stack $STACK (cli|fastapi|nx-monorepo)" >&2; exit 2 ;;
 esac
 
 [[ -d "$TEMPLATE_DIR" ]] || { echo "ERROR: template not found: $TEMPLATE_DIR" >&2; exit 1; }

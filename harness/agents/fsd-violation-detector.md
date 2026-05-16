@@ -5,14 +5,14 @@ description: Feature-Sliced Design 기반 React 프로젝트({src,apps/web/src}/
 
 # fsd-violation-detector
 
-`ts-vite-react` 단일 SPA 또는 `ts-nx` 모노레포의 `apps/web/` 같은 FSD 구조 디렉토리에서 의존 방향 위반을 자동 탐지.
+`ts-nx` 모노레포의 `apps/web/` 또는 동등한 단일 SPA의 FSD 구조 디렉토리에서 의존 방향 위반을 자동 탐지.
 
 ## 적용 조건
 
 다음 둘 중 하나의 루트 아래에 `app/`, `features/`, `shared/` 중 최소 2개가 존재:
 
-- 단일 SPA: `src/`
 - Nx 모노레포: `apps/web/src/` (또는 `apps/<name>/src/` 로 FSD 채택한 React 앱)
+- 단일 SPA(외부): `src/`
 
 루트가 결정되면 이후 경로 표기는 그 루트 기준 — Nx 의 경우 `apps/web/src/features/...` 식.
 

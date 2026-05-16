@@ -13,14 +13,14 @@ allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 
 # nestjs-add-module
 
-NestJS 프로젝트(`templates/ts-nestjs` 단일 앱 또는 `templates/ts-nx` 모노레포의 `apps/api`)에 새 모듈을 추가하는 워크플로.
+NestJS 프로젝트(`templates/ts-nx` 모노레포의 `apps/api` 또는 동등한 단일 NestJS 앱)에 새 모듈을 추가하는 워크플로.
 
 ## 적용 조건
 
 다음 둘 중 하나의 **앱 루트**(`$APP_ROOT`)를 결정한 뒤 진행:
 
-- 단일 NestJS: `$APP_ROOT = .` — `src/modules/`, `prisma/schema.prisma` 존재
 - Nx 모노레포: `$APP_ROOT = apps/api` — `apps/api/src/modules/`, `apps/api/prisma/schema.prisma` 존재
+- 단일 NestJS 앱(외부): `$APP_ROOT = .` — `src/modules/`, `prisma/schema.prisma` 존재
 
 추가로 (단일/Nx 공통):
 
@@ -146,14 +146,14 @@ export class AppModule {}
 
 ### 12. Prisma 마이그레이션
 
-단일 NestJS:
-```bash
-yarn prisma migrate dev --name add-<module>
-```
-
 Nx 모노레포 (스키마가 `apps/api/prisma/schema.prisma`):
 ```bash
 yarn prisma migrate dev --name add-<module> --schema=apps/api/prisma/schema.prisma
+```
+
+단일 NestJS 앱(외부):
+```bash
+yarn prisma migrate dev --name add-<module>
 ```
 
 ### 13. 테스트
@@ -163,18 +163,18 @@ yarn prisma migrate dev --name add-<module> --schema=apps/api/prisma/schema.pris
 
 ## 완료 후 검증
 
-단일 NestJS:
-```bash
-yarn lint --fix
-yarn typecheck
-yarn test <module>
-```
-
 Nx 모노레포:
 ```bash
 yarn nx lint api --fix
 yarn nx typecheck api
 yarn nx test api --testFile=<module>
+```
+
+단일 NestJS 앱(외부):
+```bash
+yarn lint --fix
+yarn typecheck
+yarn test <module>
 ```
 
 Nx 의 경우 `apps/api/project.json` 의 `tags: ["scope:api", "type:app"]` 가 유지되는지 확인. 새 모듈을 라이브러리(`libs/`)로 분리한다면 `tags: ["scope:api", "type:feature"]` 를 명시해야 `@nx/enforce-module-boundaries` 가 동작한다.

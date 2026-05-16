@@ -1,24 +1,24 @@
 ---
-description: 새 프로젝트를 4개 스택 템플릿 중 하나로 생성하고 클린 아키텍처/lint/pre-commit/Docker를 자동 세팅합니다.
-argument-hint: <project-name> --stack=<cli|fastapi|nestjs|vite-react> [--desc "..."]
+description: 새 프로젝트를 3개 스택 템플릿(Python CLI/FastAPI, TypeScript Nx 모노레포) 중 하나로 생성하고 클린 아키텍처/lint/pre-commit/Docker를 자동 세팅합니다.
+argument-hint: <project-name> --stack=<cli|fastapi|nx-monorepo> [--desc "..."]
 ---
 
 # scaffold
 
-`$ARGUMENTS` 를 파싱해 4개 스택(cli/fastapi/nestjs/vite-react) 중 하나로 새 프로젝트를 생성합니다.
+`$ARGUMENTS` 를 파싱해 3개 스택(cli/fastapi/nx-monorepo) 중 하나로 새 프로젝트를 생성합니다.
 
-> ℹ️ 기존 `/new-project` 커맨드는 사용자의 `_template/` (Python-only) 시스템 그대로. 이 커맨드는 별개 4-스택 시스템.
+> ℹ️ 기존 `/new-project` 커맨드는 사용자의 `_template/` (Python-only) 시스템 그대로. 이 커맨드는 별개 3-스택 시스템.
 
 ## 인자 형식
 
 - `<project-name>` (필수) — 케밥/스네이크 자동 변환
-- `--stack=<cli|fastapi|nestjs|vite-react>` (필수)
+- `--stack=<cli|fastapi|nx-monorepo>` (필수)
 - `--desc="설명"` (선택)
 - `--dest=<path>` (선택, 기본은 현재 디렉토리 하위)
 
 예시:
 - `/scaffold my-api --stack=fastapi --desc="주문 처리 API"`
-- `/scaffold admin-dash --stack=vite-react`
+- `/scaffold admin-monorepo --stack=nx-monorepo`
 
 ## 실행 단계
 
@@ -50,8 +50,8 @@ argument-hint: <project-name> --stack=<cli|fastapi|nestjs|vite-react> [--desc ".
    ```
 
 5. **결과 검증**: 생성된 디렉토리의 핵심 파일 존재 확인
-   - Python: `pyproject.toml`, `src/<package>/`, `tests/`, `Dockerfile`, `.pre-commit-config.yaml`
-   - TS: `package.json`, `src/`, `Dockerfile`, `.husky/pre-commit`, `tsconfig.json`
+   - Python (`cli`/`fastapi`): `pyproject.toml`, `src/<package>/`, `tests/`, `Dockerfile`, `.pre-commit-config.yaml`
+   - TS (`nx-monorepo`): `package.json`, `nx.json`, `tsconfig.base.json`, `eslint.config.mjs`, `.husky/pre-commit`, `apps/api/project.json`, `apps/web/project.json`, `libs/shared-types/project.json`
 
 6. **다음 단계 안내**: 사용자에게 출력
    ```
@@ -68,8 +68,9 @@ argument-hint: <project-name> --stack=<cli|fastapi|nestjs|vite-react> [--desc ".
 
 - **Python CLI**: `core/` → 외부 라이브러리 import 금지
 - **Python FastAPI**: `domain/` → SQLAlchemy/Pydantic/FastAPI import 금지
-- **NestJS**: `domain/` → `@nestjs/*` import 금지, 3종 엔티티 분리 강제
-- **React**: features 간 직접 import 금지 (FSD 의존 방향)
+- **Nx 모노레포 / apps/api (NestJS)**: `domain/` → `@nestjs/*` import 금지, 3종 엔티티 분리 강제
+- **Nx 모노레포 / apps/web (React)**: features 간 직접 import 금지 (FSD 의존 방향)
+- **Nx 모노레포 (프로젝트 간)**: `@nx/enforce-module-boundaries` 가 `project.json` `tags` 기반으로 자동 강제
 
 ## 참조
 
