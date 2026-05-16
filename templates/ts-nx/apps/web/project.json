@@ -34,6 +34,13 @@
       "options": {
         "command": "tsc --noEmit -p apps/web/tsconfig.app.json"
       }
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "playwright test",
+        "cwd": "apps/web"
+      }
     }
   }
 }

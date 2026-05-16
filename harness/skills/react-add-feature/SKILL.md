@@ -4,7 +4,8 @@ description: |
   Vite + React 프로젝트에 새 feature 슬라이스를 Feature-Sliced Design 규칙대로 추가한다.
   features/<name>/{api,model,ui} + public API barrel + 라우트 + Vitest 스켈레톤을 만들고
   FSD 의존 방향을 검증한다.
-  TRIGGER when: cwd 에 `src/{features,entities,shared}/` 가 있고 사용자가 "feature 추가"
+  TRIGGER when: cwd 에 `src/{features,entities,shared}/` 또는
+  `apps/web/src/{features,entities,shared}/` 가 있고 사용자가 "feature 추가"
   또는 "<로그인/장바구니/...> 만들어줘" 형태로 요청.
   SKIP when: 단일 컴포넌트 추가(=shared/ui), 페이지만 추가, FSD 안 쓰는 일반 React 프로젝트,
   Next.js app-router(다른 구조 권장).
@@ -13,14 +14,20 @@ allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 
 # react-add-feature
 
-Vite + React(`templates/ts-vite-react` 기반) 프로젝트에 새 feature 슬라이스를 추가합니다.
+Vite + React 프로젝트(`templates/ts-vite-react` 단일 SPA 또는 `templates/ts-nx` 모노레포의 `apps/web`)에 새 feature 슬라이스를 추가합니다.
 
 ## 적용 조건
 
-- `src/features/`, `src/entities/`, `src/shared/` 디렉토리 존재
-- `package.json` 에 `react`, `vite`, `@tanstack/react-query`, `zustand` 의존성 존재
+다음 둘 중 하나의 **앱 루트**(`$APP_ROOT`)를 결정한 뒤 진행:
 
-미충족 시 작업 중단.
+- 단일 SPA: `$APP_ROOT = .` — `src/features/`, `src/entities/`, `src/shared/` 존재
+- Nx 모노레포: `$APP_ROOT = apps/web` — `apps/web/src/features/`, `apps/web/src/entities/`, `apps/web/src/shared/` 존재
+
+공통:
+
+- 어딘가의 `package.json` (앱 또는 root) 에 `react`, `vite`, `@tanstack/react-query`, `zustand` 의존성 존재
+
+미충족 시 작업 중단. 이하 모든 경로는 `$APP_ROOT/src/` 기준.
 
 ## 입력
 
@@ -108,11 +115,21 @@ grep -r "from '@/features" src/features/<name>/ --include='*.ts*' \
 
 ## 완료 후 검증
 
+단일 SPA:
 ```bash
 yarn lint --fix
 yarn typecheck
 yarn test src/features/<name>
 ```
+
+Nx 모노레포:
+```bash
+yarn nx lint web --fix
+yarn nx typecheck web
+yarn nx test web --testFile=features/<name>
+```
+
+Nx 의 경우 FSD 위반은 `fsd-violation-detector` 에이전트로 별도 검사 (Nx tags 와 다른 층위). 새 feature 를 라이브러리(`libs/<name>`)로 분리한다면 `project.json` 에 `tags: ["scope:web", "type:feature"]` 를 명시해야 `@nx/enforce-module-boundaries` 가 동작한다.
 
 ## 안티패턴 (자동 차단)
 

@@ -1,5 +1,7 @@
 # React (Vite SPA) 프로젝트 룰
 
+`templates/ts-vite-react` 단일 SPA 와 `templates/ts-nx` 모노레포의 `apps/web` 양쪽에 적용. 후자에서는 아래 `src/` 를 `apps/web/src/` 로 읽는다. Nx 의 경우 `@nx/enforce-module-boundaries` 가 프로젝트 간 경계를 자동으로 강제하므로, 이 룰은 **앱 내부 FSD** 만 다룬다.
+
 ## 폴더 구조 (Feature-Sliced Design lite)
 
 ```

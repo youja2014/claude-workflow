@@ -1,5 +1,7 @@
 # NestJS 프로젝트 룰
 
+`templates/ts-nestjs` 단일 앱과 `templates/ts-nx` 모노레포의 `apps/api` 양쪽에 적용. 후자에서는 아래 `src/` 를 `apps/api/src/` 로 읽고, `prisma/` 를 `apps/api/prisma/` 로 읽는다.
+
 ## 폴더 구조 (모듈별 헥사고날)
 
 ```
