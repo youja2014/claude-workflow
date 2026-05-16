@@ -117,6 +117,8 @@ if [[ "$MODE" == "existing" ]]; then
     case "$comp" in
       githooks-stack)   needs_stack=1 ;;
       makefile)         needs_stack=1; needs_name=1 ;;
+      docs-skeleton)    needs_stack=1 ;;
+      claude-md)        needs_stack=1; needs_name=1 ;;
     esac
   done
 
@@ -186,6 +188,20 @@ if [[ "$MODE" == "existing" ]]; then
     installed+=("$dst")
   }
 
+  # Recursively copy a directory tree, calling install_file per regular file.
+  # Per-file conflict policy (skip-if-exists) is inherited from install_file.
+  install_dir() {
+    local src_dir="$1" dst_dir="$2"
+    if [[ ! -d "$src_dir" ]]; then
+      echo "ERROR: source dir not found: $src_dir" >&2
+      exit 1
+    fi
+    while IFS= read -r -d '' src_file; do
+      local rel="${src_file#$src_dir/}"
+      install_file "$src_file" "$dst_dir/$rel"
+    done < <(find "$src_dir" -type f -print0)
+  }
+
   for comp in "${COMP_LIST[@]}"; do
     case "$comp" in
       githooks-universal)
@@ -204,9 +220,15 @@ if [[ "$MODE" == "existing" ]]; then
       makefile)
         install_file_subst "$TEMPLATE_DIR/Makefile" "$DEST/Makefile"
         ;;
+      docs-skeleton)
+        install_dir "$TEMPLATE_DIR/docs" "$DEST/docs"
+        ;;
+      claude-md)
+        install_file_subst "$TEMPLATE_DIR/CLAUDE.md" "$DEST/CLAUDE.md"
+        ;;
       *)
         echo "ERROR: unknown component: $comp" >&2
-        echo "Available: githooks-universal, githooks-stack, install-script, makefile" >&2
+        echo "Available: githooks-universal, githooks-stack, install-script, makefile, docs-skeleton, claude-md" >&2
         exit 2
         ;;
     esac
