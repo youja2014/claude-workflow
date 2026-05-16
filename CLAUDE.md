@@ -52,9 +52,9 @@
 ### 스크립트 (scripts/*)
 
 - `install.sh`: 복사 + checksum 추적. `.local` 파일 절대 보존.
-- `scaffold.sh`: 템플릿 복사 + 플레이스홀더 치환 + git init + pre-commit/husky 설치
+- `scaffold.sh`: 템플릿 복사 + `harness/project/` overlay + 플레이스홀더 치환 + git init + `.githooks/` 활성화
 - `doctor.sh`: uv, yarn, docker, git, python>=3.12, node lts 검증
-- `settings-merge.py`: `settings.partial.json` 을 `~/.claude/settings.json` 에 hook 중복 없이 머지
+- `settings-merge.py`: `harness/global/settings.json` 을 `~/.claude/settings.json` 에 hook 중복 없이 머지
 
 ## Commit & Versioning (이 프로젝트의 모든 커밋)
 
@@ -114,5 +114,5 @@ Claude Code 는 설정 출처별 우선순위가 정해져 있음. 같은 이름
 - `~/.claude/CLAUDE.local.md`, `~/.claude/settings.local.json` 수정
 - `~/.claude/settings.json` 직접 편집 (반드시 `scripts/settings-merge.py` 경유)
 - 심볼릭 링크 기본값화 (Windows 권한 이슈)
-- `--no-verify` 로 pre-commit 우회
+- `--no-verify` 로 git hook 우회 (`.githooks/{commit-msg,pre-commit,pre-push}`)
 - `D:/Personal/workspace/_template/` 수정 (사용자 기존 시스템 — 별개로 두기로 결정)
