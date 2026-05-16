@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+      target: runtime
+    image: __project_kebab__:latest
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src:ro
+    stdin_open: true
+    tty: true

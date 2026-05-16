@@ -1,0 +1,8 @@
+services:
+  web:
+    build:
+      context: .
+      target: runtime
+    image: __project_kebab__:latest
+    ports:
+      - "8080:80"
