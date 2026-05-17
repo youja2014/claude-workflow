@@ -7,8 +7,10 @@
 - WIP 커밋 금지 — 작업 완료 후 커밋
 
 ## 브랜치
-- main/master: 항상 배포 가능한 상태 유지
-- 브랜치명: `<type>/<short-description>` (feat/add-auth, fix/login-error)
+- 기본 브랜치는 **`main`** (GitHub 2020-10 표준, master 사용 금지)
+- main: 항상 배포 가능한 상태 유지
+- 작업 브랜치명: `<type>/<short-description>` (예: `feat/add-auth`, `fix/login-error`)
+- type 은 commit type 과 동일 (feat, fix, docs, refactor, test, chore, perf, ci)
 - 장기 브랜치 금지 — 가능한 빨리 머지
 
 ## PR

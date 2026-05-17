@@ -389,8 +389,8 @@ workflow_rev=$WORKFLOW_REV
 scaffolded_at=$WORKFLOW_DATE
 EOF
 
-# 5. git init
-( cd "$DEST" && git init -q && git add -A && git commit -q -m "chore: scaffold $STACK from claude-workflow" || true )
+# 5. git init (main as default branch — ADR-0003, follows GitHub 2020-10 standard)
+( cd "$DEST" && git init -q -b main && git add -A && git commit -q -m "chore: scaffold $STACK from claude-workflow" || true )
 
 # 6. Stack-specific post-init
 case "$LANG" in
