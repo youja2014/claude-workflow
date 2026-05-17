@@ -1,4 +1,4 @@
-.PHONY: help doctor install install-dry install-yes uninstall sync verify install-git-hooks test test-install test-templates test-templates-full clean
+.PHONY: help doctor install install-dry install-yes uninstall sync verify install-git-hooks test test-install test-templates test-templates-full eol-check clean
 
 help:
 	@echo "claude-workflow management targets:"
@@ -15,6 +15,7 @@ help:
 	@echo "  test-install          Verify install/uninstall cycle in isolated HOME"
 	@echo "  test-templates        Scaffold + lint/typecheck/test each Python template"
 	@echo "  test-templates-full   Same as test-templates plus yarn install for TS templates"
+	@echo "  eol-check             Poll endoflife.date for tracked runtime EOLs (Phase 4)"
 	@echo "  clean                 Remove generated caches"
 
 doctor:
@@ -49,6 +50,9 @@ test-templates:
 
 test-templates-full:
 	bash scripts/test-templates.sh --with-yarn
+
+eol-check:
+	bash scripts/eol-check.sh
 
 clean:
 	rm -rf .ruff_cache .pytest_cache .mypy_cache node_modules
