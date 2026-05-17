@@ -115,6 +115,44 @@ Claude Code 는 설정 출처별 우선순위가 정해져 있음. 같은 이름
 - 프로젝트 특화 규칙이 글로벌을 덮어야 한다면 **이름을 다르게** 짓거나 `plugin:<name>:` 네임스페이스 활용
 - 사용자가 글로벌·프로젝트 분할 결정 시 이 우선순위를 명시적으로 안내
 
+## 정보 분류 — memory / docs / repo (ADR-0001/0002)
+
+이 프로젝트는 정보를 3 종류로 분리해 관리합니다. 같은 정보를 두 곳에 두지 마세요.
+
+### memory (`~/.claude/projects/<proj>/memory/`)
+- **성격**: Claude 의 cross-session 학습된 정책 / 사용자 프로필 / 패턴
+- **시간**: 무관 (정책성). 시간 따라 stale 가능 — 사용 전 검증 필요
+- **소유**: Claude 가 작성, 사용자 명시 요청 시 수정
+- **예**: `[[user-workflow]]`, `[[feedback-vendor-neutral]]`, `[[project-definition]]`
+
+### docs/handoffs/ (`docs/handoffs/YYYY-MM-DD.md`)
+- **성격**: 시간순 작업 timeline. 세션 간 인계
+- **시간**: 누가 무엇을 결정·실행했는지의 시간 추적
+- **소유**: 퇴근 시 작성, **immutable** (다음날 수정 금지 — 새 handoff 작성)
+
+### docs/decisions/ (`docs/decisions/NNNN-<topic>.md`)
+- **성격**: immutable 결정 기록 (ADR). repo 와 함께 영구 보존
+- **시간**: timeline 일부지만 의도는 영구. Status 만 변동 (`Superseded by NNNN`)
+- **소유**: 결정 시점 작성. **immutable** (단 Status 변경은 허용)
+
+### docs/ 그 외 (architecture, status, plans, domain)
+- **성격**: 안정 정보 (architecture / domain) + 변화 정보 (status / plans)
+- **시간**: status 는 매 세션 갱신, architecture 는 구조 변경 시
+
+### 분류 결정 규칙
+
+새 정보가 발생하면:
+1. **시간순 흐름** (어제/오늘/내일 무엇) → `docs/handoffs/`
+2. **불변 결정** (왜 X 를 선택, trade-off 있음) → `docs/decisions/`
+3. **사용자/프로젝트 학습 패턴** (cross-session 적용) → `memory/`
+4. **구조/도메인 설명** (안정 reference) → `docs/architecture.md`, `docs/domain/`
+5. **현재 상태 한 페이지** → `docs/status.md`
+6. **계획** (어떻게 진행) → `docs/plans/exec-plans/<name>.md`
+
+**Anti-pattern**: memory 에 cumulative 시간 timeline 누적 (예: 3rd~6th 세션 한 파일에 누적). 시간순은 `docs/handoffs/` 로, 영구 결정은 `docs/decisions/` 로 분리.
+
+자세한 결정 근거: `docs/decisions/0001-self-application.md`, `0002-documentation-first.md`.
+
 ## 절대 하지 말 것
 
 - `~/.claude/CLAUDE.local.md`, `~/.claude/settings.local.json` 수정
@@ -122,3 +160,5 @@ Claude Code 는 설정 출처별 우선순위가 정해져 있음. 같은 이름
 - 심볼릭 링크 기본값화 (Windows 권한 이슈)
 - `--no-verify` 로 git hook 우회 (`.githooks/{commit-msg,pre-commit,pre-push}`)
 - `D:/Personal/workspace/_template/` 수정 (사용자 기존 시스템 — 별개로 두기로 결정)
+- **시간순 정보를 memory 에 cumulative 로 누적** (ADR-0001 위반) — `docs/handoffs/` 로
+- **trade-off 결정을 commit message 에만 기록** (ADR-0002 위반) — `docs/decisions/NNNN-*.md` 로
