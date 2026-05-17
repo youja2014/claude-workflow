@@ -68,14 +68,19 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
 
 ## 로컬 / 글로벌 분리
 
-`~/.claude/` 에는 세 부류 파일이 공존합니다:
+`~/.claude/` 에는 두 부류 파일이 공존합니다:
 
-- **이 프로젝트가 관리 (스택별)**: `settings.json` 일부, `rules/python/*`, `rules/typescript/*`, `skills/`, `hooks/`, `agents/`
-- **사용자 글로벌 (이 프로젝트가 손대지 않음)**: `CLAUDE.md`(사용자 글로벌), `rules/common/{code-quality,security,git}.md` 등 범용 룰. 사용자 책임으로 별도 관리.
+- **이 프로젝트가 제공 (install.sh 가 배포)**:
+  - 광역 룰 — `rules/common/{code-quality,git,security}.md`
+  - 스택별 룰 — `rules/python/*`, `rules/typescript/*`
+  - 라이프사이클 skills — `skills/{scaffold,context-restore,context-save,plan,code-review,...}/`
+  - 전문 agents — `agents/{architect,code-reviewer,tdd-guide,build-error-resolver,clean-arch-detector,fsd-violation-detector}.md`
+  - 결정적 hooks — `hooks/{block-dangerous,format-on-save}.sh`
+  - `settings.json` 일부 (hook 등록, `scripts/settings-merge.py` 가 안전 머지)
 - **로컬 머신 전용 (덮어쓰기 절대 금지)**: `CLAUDE.local.md`, `settings.local.json`
 
-즉 `harness/global/rules/` 에는 **스택별 룰만** 둡니다(`common/` 디렉토리 없음). 범용 룰은 사용자가 직접 작성하거나
-외부 카탈로그에서 가져와 `~/.claude/rules/common/` 에 두며, 이 프로젝트의 install/uninstall 은 그 영역을 건드리지 않습니다.
+기존 파일과 충돌하면 install.sh 는 `[k]eep / [o]verwrite / [d]iff / [b]ackup&replace` 를 인터랙티브로
+묻습니다. 사용자가 직접 손본 자산은 [k]eep 으로 보존되며, 이 프로젝트가 강제로 덮어쓰지 않습니다.
 
 ## 스택별 클린 아키텍처 요약
 

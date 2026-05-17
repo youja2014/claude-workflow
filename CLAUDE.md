@@ -13,7 +13,13 @@
 
 ## 디렉토리 책임
 
-- `harness/global/` — `~/.claude/` 에 배포되는 **글로벌** 컨텐츠. 모든 프로젝트 자동 적용. 사용자 절대 원칙: 범용 rules, 보안 hook, 범용 agent/skill/slash command. 수정 시 신중 (글로벌 영향).
+- `harness/global/` — `~/.claude/` 에 배포되는 **글로벌** 컨텐츠. 모든 프로젝트 자동 적용. 5 하위 디렉토리:
+  - `rules/` — 광역 코딩 표준 (`common/`: code-quality/git/security) + 스택별 (`python/`, `typescript/`)
+  - `agents/` — 전문 서브에이전트 (architect, code-reviewer, tdd-guide, build-error-resolver, clean-arch-detector, fsd-violation-detector)
+  - `skills/` — 사용자 라이프사이클 [[user-workflow]] 지원 (scaffold + context-restore/save + plan + code-review) + 스택별 add-module (fastapi/nestjs/react)
+  - `hooks/` — 결정적 강제 (block-dangerous, format-on-save)
+  - `scripts/` — 자산이 참조하는 헬퍼 (find-workflow-home.sh)
+  - 수정 시 신중 — 모든 프로젝트에 영향.
 - `harness/project/` — **프로젝트 옵트인** 주입용 자산. `/scaffold` 가 신규 scaffold 또는 기존 프로젝트 adoption 시 복사. 현재 내용: stack-agnostic 공통 git hooks (`commit-msg`, `pre-push`) + `install-git-hooks.sh`. 스택별 자산은 여기 두지 말 것 — 그건 `templates/<stack>/` 책임.
 - `templates/` — 스택별 **검증 sandbox + reference repo**. `/scaffold` 가 신규 프로젝트 복사 원본으로 사용. 각 템플릿은 독립적으로 빌드 가능해야 함 (`make lint && make typecheck && make test && make docker-build`).
 - `scripts/` — 설치/scaffold/검증/머지 로직. Windows bash에서 동작 보장.
