@@ -1,8 +1,14 @@
 # TypeScript Docker Rules
 
+## Base image 정책
+
+- Base: `node:22-alpine` (서버) 또는 `nginx:alpine` (정적 SPA)
+- **EOL**: Node 22 Jod LTS = 2027-04 (Maintenance 단계, 2025-10 진입). 다음 LTS = Node 24 Krypton (Active LTS, 2026-10 까지 Active). drift 체크: `bash scripts/eol-check.sh` (ADR Phase 4)
+- alpine 캐비엇: `npm ci` / `npm install` 의 "Exit handler never called" 버그가 Node 22/24 + Alpine 조합에서 보고됨 (https://github.com/npm/cli/issues/8974). 본 프로젝트는 **yarn (corepack)** 사용으로 우회. npm 직접 호출 회피 권장.
+- musl libc 호환성 — native binary 가 있는 패키지 (예: prisma, sharp) 는 alpine 변형 확인 필요. 호환 안 되면 `node:22-slim` (Debian glibc) 으로 전환
+
 ## Dockerfile
 
-- Base: `node:20-alpine` (서버) 또는 `nginx:alpine` (정적 SPA)
 - **multi-stage build** 필수: builder → runtime
 - `corepack enable` 로 yarn 활성화 (Node 16.10+ 내장)
 - 의존성 → 소스 순서로 COPY (레이어 캐시 최적화)
@@ -12,7 +18,7 @@
 
 ```dockerfile
 # --- builder ---
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 RUN corepack enable
 COPY package.json yarn.lock ./
@@ -21,7 +27,7 @@ COPY . .
 RUN yarn build
 
 # --- runtime ---
-FROM node:20-alpine AS runtime
+FROM node:22-alpine AS runtime
 RUN corepack enable && addgroup -S app && adduser -S app -G app
 WORKDIR /app
 COPY --from=builder /app/package.json /app/yarn.lock ./
@@ -35,7 +41,7 @@ CMD ["node", "dist/main.js"]
 ### Vite SPA 예시
 
 ```dockerfile
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 RUN corepack enable
 COPY package.json yarn.lock ./

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-ARG NODE_VERSION=20-alpine
+ARG NODE_VERSION=22-alpine
 ARG NGINX_VERSION=1.27-alpine
 
 FROM node:${NODE_VERSION} AS base
