@@ -38,11 +38,14 @@ check "docker"       "docker --version"            required
 check "docker compose" "docker compose version"    required
 
 echo
+echo "Required by pre-push hook (after 'make install-git-hooks'):"
+check "make"         "make --version"              optional
+
+echo
 echo "Optional/dev tooling:"
 check "pre-commit"   "pre-commit --version"        optional
 check "jq"           "jq --version"                optional
 check "gh"           "gh --version"                optional
-check "make"         "make --version"              optional
 check "ruff"         "uvx ruff --version"          optional
 check "pyright"      "uvx pyright --version"       optional
 

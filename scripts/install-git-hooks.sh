@@ -25,6 +25,16 @@ fi
 # Make hook scripts executable (lost on some Windows filesystems)
 chmod +x .githooks/* 2>/dev/null || true
 
+# pre-push delegates to 'make verify'; activating hooks without make would
+# silently surface as a confusing "make: command not found" on the next push.
+if ! command -v make >/dev/null 2>&1; then
+  echo "ERROR: 'make' not found in PATH — required by .githooks/pre-push." >&2
+  echo "  Windows: winget install ezwinports.make    (then restart shell)" >&2
+  echo "  Debian:  sudo apt install make" >&2
+  echo "  macOS:   brew install make    (or use Xcode CLT)" >&2
+  exit 1
+fi
+
 git config core.hooksPath .githooks
 echo "[install-git-hooks] core.hooksPath -> .githooks"
 echo "[install-git-hooks] active hooks:"
