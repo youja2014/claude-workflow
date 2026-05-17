@@ -57,8 +57,12 @@ case "$ext" in
     fi
     ;;
   ts|tsx|js|jsx|json|md|yml|yaml|css|html)
+    # Walk up looking for package.json. Guard against fixed-point loops
+    # (e.g. Windows bash returns `dirname "D:"` == "D:", which would otherwise spin forever).
     proj_dir="$(dirname "$FILE_PATH")"
-    while [[ "$proj_dir" != "/" && "$proj_dir" != "." && ! -f "$proj_dir/package.json" ]]; do
+    prev_dir=""
+    while [[ "$proj_dir" != "/" && "$proj_dir" != "." && "$proj_dir" != "$prev_dir" && ! -f "$proj_dir/package.json" ]]; do
+      prev_dir="$proj_dir"
       proj_dir="$(dirname "$proj_dir")"
     done
     if [[ -f "$proj_dir/package.json" ]]; then
