@@ -87,12 +87,50 @@ uv run pytest tests/test_<module>.py -v
 
 ## 5. 최종 검증
 
+### Python
 ```bash
 uv run pytest -v                          # 전체 테스트 (회귀 확인)
 uv run ruff check src/ tests/            # lint
 uv run pyright src/                       # type
 make verify                               # 메타 프로젝트면
 ```
+
+### TypeScript / Nx
+```bash
+yarn nx run-many -t test                  # 전체 테스트 (또는 nx affected)
+yarn nx run-many -t lint
+yarn nx run-many -t typecheck
+make verify
+```
+
+## 5b. TypeScript variant — 도구 대체
+
+본 SKILL 의 RED → GREEN → REFACTOR 사이클은 동일. 도구만 stack 별 분기:
+
+| 항목 | Python | TypeScript |
+|---|---|---|
+| 단위 테스트 (web) | pytest | Vitest (`apps/web`) |
+| 단위 테스트 (api) | pytest | Jest (`apps/api`, NestJS) |
+| watch 모드 | `pytest-watch` | `yarn vitest` / `yarn jest --watch` |
+| 단일 테스트 | `pytest tests/test_x.py::test_y -v` | `yarn vitest x.test.ts` / `yarn jest --testNamePattern="..."` |
+| Assertion | `assert`, `pytest.raises` | `expect().toBe()`, `expect().toThrow()` |
+| mock 라이브러리 | `pytest-monkeypatch`, `unittest.mock` | `vi.mock()`, `jest.mock()`, MSW (HTTP) |
+
+RED 예시 (TS, vitest):
+```ts
+import { describe, it, expect } from 'vitest';
+import { calculateProfit } from './profit-calculator';
+
+describe('calculateProfit', () => {
+  it('returns total profit for valid trades', () => {
+    const result = calculateProfit([{ buy: 100, sell: 150 }]);
+    expect(result.totalProfit).toBe(50);
+  });
+});
+```
+→ `yarn vitest profit-calculator` 실행 → FAIL (target 없음). 정상.
+
+자세한 룰: `~/.claude/rules/typescript/testing.md` + tdd-guide agent 본문.
 
 ## 6. 규칙
 

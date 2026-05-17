@@ -60,15 +60,39 @@ docker compose logs <service> 2>&1
 
 ## 4. 일반 해결 매트릭스
 
+### Python
+
 | 에러 | 원인 | 해결 |
 |---|---|---|
 | ModuleNotFoundError | 패키지 미설치 | `uv add <pkg>` |
 | ImportError 순환참조 | 모듈 간 상호 import | `from __future__ import annotations` + TYPE_CHECKING 가드 |
-| Docker CRLF 에러 | Windows 줄바꿈 | `.gitattributes` `* text=auto eol=lf` + `sed -i 's/\r$//' file` |
-| Permission denied (Docker) | root 권한 문제 | Dockerfile 에 `RUN useradd -m app && USER app` |
 | uv.lock 충돌 | 의존성 변경 | `uv lock` 재실행 |
-| Nx project not found | tsconfig path / project.json 누락 | `yarn nx graph` 확인 |
-| ruff/eslint 자동 수정 가능 | 스타일 위반 | `--fix` 옵션 |
+
+### TypeScript / Nx
+
+| 에러 | 원인 | 해결 |
+|---|---|---|
+| Nx project not found | tsconfig path / project.json 누락 | `yarn nx graph` 확인, `tsconfig.base.json` paths |
+| `Cannot find module '@<ws>/<lib>'` | workspace paths 미설정 | `tsconfig.base.json` paths + `project.json` tags |
+| `npm Exit handler never called` (Node 22+alpine) | npm/cli#8974 | yarn (corepack) 사용 또는 `node:22-slim` |
+| `workspace:*` in production deps | Nx generatePackageJson 누수 | type-only export 는 `devDependencies` 로 이동 |
+| `PrismaClient is not generated` | postinstall 누락 | Dockerfile 양 stage 에서 `yarn prisma generate` 명시 |
+| `MODULE_TYPELESS_PACKAGE_JSON` | ESM/CJS 충돌 | `.cjs` 확장자 또는 `"type": "module"` |
+| `EPERM symlink` (Windows yarn PnP) | yarn 4 기본 PnP | `.yarnrc.yml` 에 `nodeLinker: node-modules` |
+
+### Docker (공통)
+
+| 에러 | 원인 | 해결 |
+|---|---|---|
+| Docker CRLF 에러 | Windows 줄바꿈 | `.gitattributes` `* text=auto eol=lf` + `sed -i 's/\r$//' file` |
+| Permission denied | root 권한 문제 | Dockerfile 에 `RUN useradd -m app && USER app` |
+| compose race (`P1001` Prisma postgres) | DB ready 전 connect | compose healthcheck + `depends_on: { condition: service_healthy }` |
+
+### Lint / 스타일 (양쪽)
+
+| 에러 | 원인 | 해결 |
+|---|---|---|
+| ruff/eslint 자동 수정 가능 | 스타일 위반 | `--fix` 옵션 (`ruff check --fix` / `eslint --fix`) |
 
 ## 5. 적용 + 검증
 

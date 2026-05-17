@@ -51,6 +51,12 @@ grep -rEn "raw\(['\"]\s*SELECT" --include="*.ts" --include="*.py" .
 - API 핸들러에서 Pydantic / class-validator / Zod 등 검증 스키마 사용 여부
 - 파일 경로 입력에 `..` 차단 (path traversal)
 - 외부 redirect URL whitelist 검증
+- React: `dangerouslySetInnerHTML` 사용처에 sanitization (DOMPurify 등) — `grep -rn dangerouslySetInnerHTML apps/web/src/`
+
+### (d-1) 클라이언트 환경변수 누설 (TS / Vite 전용)
+- Vite 는 `VITE_*` 프리픽스만 클라이언트 번들에 노출. 비밀이 잘못 노출되면 빌드 결과에 영구 박힘
+- 점검: `grep -rEn "VITE_[A-Z_]+(SECRET|TOKEN|PASSWORD|KEY)" apps/web/`
+- 점검: `.env` 의 `VITE_*` 항목 중 비밀 키워드 포함 여부
 
 ### (e) 안전하지 않은 의존성
 ```bash
