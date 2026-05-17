@@ -5,10 +5,15 @@
 ## 현재 상태
 
 - branch: **`main`** (ADR-0003)
-- 로컬 커밋 누적: **51+** (8th session 5 commits 포함, 본 commit 으로 + 1)
-- working tree: clean (본 commit 직후)
+- 로컬 커밋 누적: **52** (8th session 6 commits 포함, origin/main 동기)
+- working tree: clean
 - remote: ✅ `origin = https://github.com/youja2014/claude-workflow.git` — main tracking, push 완료
-- 마지막 검증: pre-push `make verify` PASS (test-install + test-templates 3/3) — 8th session 의 push 직전 실행 시점
+- 마지막 검증: pre-push `make verify` PASS (test-install + test-templates 3/3) — recovery commit push 시점
+
+## 자가 평가 (8th session 끝, 사용자 "완성됐나?" 응답 반영)
+
+- "혼자 쓰기에는 충분, 다른 사람에게 권유하려면 부족" 단계.
+- 권유 가능 단계로 가려면 아래 "다음 후보" 의 #1 (외부 의존성 변동 흡수 전략), #3 (handoff hash 검증 룰), #4 (silent exclude 재발 감시) 가 선행 필요.
 
 ## 진행 중
 
@@ -22,7 +27,8 @@
 - `02b924d` `docs(skills): expand TypeScript variant table in build-fix/security-scan`
 - `3ef34f4` `fix(templates/python-cli): relax reportUnknownMemberType for typer compat`
 - `fe7618e` `chore(scripts): name make as pre-push dep in doctor + install-git-hooks`
-- (본 commit) `docs: wrap up 8th session (push + status + handoff)`
+- `46c1a1e` `fix(docs): recover docs/ tree silently excluded since 7th session` — 7th session 의 docs/ 16 파일이 `.git/info/exclude → docs/` 로 silent skip 되어 한 번도 commit 되지 않았음을 본 세션에서 발견 후 복구
+- (본 commit) `docs: close 8th session (status + memory sync)`
 
 핵심 결과:
 - GitHub remote 등록 + 51 commits push (백업 완료).
