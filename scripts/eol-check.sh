@@ -11,10 +11,9 @@
 #   2 — internal error (network, jq missing, etc.)
 #
 # Why this exists:
-#   Phase 4 of 2026-05-17 self-adoption (docs/plans/exec-plans/...).
-#   Addresses gap #1 (Drift): runtime EOL was discovered only when the user
+#   Addresses drift: runtime EOL was discovered only when the user
 #   pointed it out (Node 20 EOL on 2026-04-30). This script makes drift
-#   detection mechanical.
+#   detection mechanical and is wired into `make verify`.
 
 set -uo pipefail
 
