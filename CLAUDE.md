@@ -15,7 +15,7 @@
 
 - `harness/global/` — `~/.claude/` 에 배포되는 **글로벌** 컨텐츠. 모든 프로젝트 자동 적용. 5 하위 디렉토리:
   - `rules/` — 광역 코딩 표준 (`common/`: code-quality/git/security) + 스택별 (`python/`, `typescript/`)
-  - `agents/` — 전문 서브에이전트 (architect, code-reviewer, tdd-guide, build-error-resolver, clean-arch-detector, fsd-violation-detector)
+  - `agents/` — 전문 서브에이전트 (architect, code-reviewer, tdd-guide, build-error-resolver, clean-arch-detector, fsd-violation-detector, feature-orchestrator)
   - `skills/` — 사용자 라이프사이클 [[user-workflow]] 지원 (scaffold + context-restore/save + plan + code-review) + 스택별 add-module (fastapi/nestjs/react)
   - `hooks/` — 결정적 강제 (block-dangerous, format-on-save)
   - `scripts/` — 자산이 참조하는 헬퍼 (find-workflow-home.sh)
