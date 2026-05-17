@@ -108,6 +108,29 @@ docker compose logs <service> 2>&1
 - 같은 에러가 반복되면 [[continuous-learning]] 패턴 따라 메모리 또는 rules 에 기록 권장
 - 환경 의존 (Windows CRLF 등) 이면 `.gitattributes` / `.editorconfig` / hook 으로 강제
 
+## 6b. TypeScript variant — 도구 대체
+
+본 SKILL 의 6 카테고리 분류 + 6 단계 흐름은 stack 무관. 도구만 분기:
+
+| 항목 | Python | TypeScript / Nx |
+|---|---|---|
+| 패키지 매니저 | uv | yarn (corepack) |
+| Lint | `uv run ruff check` | `yarn nx run-many -t lint` |
+| Type check | `uv run pyright` | `yarn nx run-many -t typecheck` |
+| Test | `uv run pytest` | `yarn nx run-many -t test` (또는 `nx affected`) |
+| 의존성 충돌 | `uv pip check`, `uv tree` | `yarn install --check-files`, `yarn nx graph` |
+| Lock 재생성 | `uv lock` | `yarn install` (`yarn.lock` 갱신) |
+| 잦은 에러 매트릭스 | "### Python" 표 (위) | "### TypeScript / Nx" 표 (위) |
+
+빠른 참조: TS / Nx 진단 최소 셋
+```bash
+yarn nx graph                              # workspace 의존 그래프
+yarn nx run-many -t lint,typecheck,test    # 전체 검증
+yarn install --check-files                 # node_modules 무결성
+```
+
+자세한 룰: `~/.claude/rules/typescript/{style,testing,docker}.md`, `~/.claude/rules/typescript/{nestjs,react}.md`.
+
 ## 출력 형식
 
 ```markdown

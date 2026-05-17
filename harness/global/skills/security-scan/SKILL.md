@@ -121,6 +121,35 @@ cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
 **도구 권장:** gitleaks, trivy, pip-audit (없으면 설치 안내)
 ```
 
+## 6b. TypeScript variant — 도구 대체
+
+본 SKILL 의 6 항목 + 심각도 분류는 stack 무관. 도구·점검 포인트만 분기:
+
+| 항목 | Python | TypeScript / Nx |
+|---|---|---|
+| 의존성 audit | `uv pip check`, `pip-audit` | `yarn npm audit` |
+| 컨테이너 이미지 | `trivy fs` | `trivy fs` (공통) |
+| 시크릿 스캔 | `gitleaks detect` (공통) | `gitleaks detect` (공통) |
+| 입력 검증 스키마 | Pydantic v2 | class-validator (NestJS), Zod (Vite/React) |
+| 클라이언트 비밀 누설 | — | **`VITE_*` 프리픽스만 번들 노출** — 비밀 키워드 점검 (위 d-1) |
+| XSS / DOM | Jinja autoescape 등 | `dangerouslySetInnerHTML` + DOMPurify (위 d) |
+| Docker non-root | `USER app` | `USER app` (공통) |
+
+빠른 참조: TS / Nx 점검 최소 셋
+```bash
+# VITE_* 환경변수 비밀 누설
+grep -rEn "VITE_[A-Z_]+(SECRET|TOKEN|PASSWORD|KEY)" apps/web/ .env* 2>/dev/null
+
+# dangerouslySetInnerHTML 사용처 sanitization 확인
+grep -rn dangerouslySetInnerHTML apps/web/src/
+
+# 의존성 + 이미지
+yarn npm audit
+command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL .
+```
+
+자세한 룰: `~/.claude/rules/typescript/{docker,react,nestjs}.md`, `~/.claude/rules/common/security.md`.
+
 ## 참조
 
 - `rules/common/security.md` — 보안 룰 출처
