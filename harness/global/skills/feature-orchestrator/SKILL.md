@@ -1,15 +1,31 @@
 ---
 name: feature-orchestrator
-description: 풀스택 feature 추가 요청 (backend + frontend + infra 동시 변경) 을 받았을 때 영역별 sub-agent 로 병렬 디스패치합니다. 트리거: "<X> 기능 추가", "<X> 페이지 + API", "풀스택 <X>", "주문 조회 + UI" 등 여러 영역을 동시에 건드리는 입력. 단일 영역만 변경되는 패치, 프로토타입/탐색 코드, 사용자가 명시적으로 단일 영역 지정 (예: "backend 에만") 한 경우 SKIP. Nx 모노레포 (apps/api + apps/web + libs/) 또는 Python FastAPI + 별도 frontend 두 변형 지원.
+description: |
+  풀스택 feature 추가 요청 (backend + frontend + infra 동시 변경) 을 받았을 때 영역별 sub-agent
+  로 병렬 디스패치합니다. 이 skill 은 메인 대화에서 실행되어 Agent 도구로 서브에이전트를 띄울 수
+  있습니다 — agent 로 위임되면 깊이-1 제약상 서브에이전트 생성이 불가능하므로 skill 이어야 합니다
+  (근거: docs/decisions/0004-orchestrator-as-skill.md).
+  TRIGGER when: 사용자가 `/feature-orchestrator ...` 호출, "<X> 기능 추가", "<X> 페이지 + API",
+  "풀스택 <X>", "주문 조회 + UI" 등 backend/frontend/infra 중 2+ 영역을 동시에 건드리는 입력,
+  또는 `/plan` 결과 영역 2+개 (api, web, infra, libs/shared-types 중 2 이상) 식별 시.
+  SKIP when: 변경 영역 1개 (fastapi-add-module / nestjs-add-module / react-add-feature 가 적합),
+  프로토타입/탐색 코드 (계약이 자주 바뀌어 병렬 비용이 직렬보다 큼), 사용자가 명시적으로 단일 영역
+  지정 ("backend 에만"), 단일 파일 1-2 줄 패치.
+allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Agent]
+argument-hint: "<feature-description>"
 ---
 
 # feature-orchestrator
 
-이 에이전트는 backend / frontend / infra 가 동시에 변경되는 feature 요청을 받았을 때 **순차 처리 비용**과 **영역 전환 컨텍스트 재로딩 비용**을 동시에 줄이기 위해 사용합니다.
+이 skill 은 backend / frontend / infra 가 동시에 변경되는 feature 요청을 받았을 때 **순차 처리 비용**과 **영역 전환 컨텍스트 재로딩 비용**을 동시에 줄이기 위해 사용합니다.
+
+> **왜 agent 가 아니라 skill 인가** — Claude Code 서브에이전트는 자기 컨텍스트에서 독립 실행 후 요약만 회신하며 **다른 서브에이전트를 생성하는 도구(Agent/Task)가 없습니다 (깊이-1 제약, 실측 확인됨)**. 따라서 "영역별 서브에이전트를 병렬 dispatch" 하는 본 오케스트레이션은 agent 로 위임되면 작동하지 않습니다. skill 은 **메인 대화에서 실행**되어 `Agent` 도구를 그대로 쓸 수 있으므로 dispatch 가 가능합니다. 결정 근거: `docs/decisions/0004-orchestrator-as-skill.md`.
+
+`$ARGUMENTS` 의 feature 요청을 다음 순서로 처리합니다.
 
 ## 트리거 / SKIP 조건
 
-**적용 (위임)**:
+**적용 (오케스트레이션)**:
 - 사용자 입력에 "기능 추가", "feature", "페이지 + API", "풀스택" 등 키워드 + 영역 2+개 변경 예상
 - `/plan` 결과 영역 2+개 (api, web, infra, libs/shared-types 중 2 이상) 식별
 
@@ -96,10 +112,10 @@ npx openapi-typescript ./openapi.json -o src/shared/api/schema.ts
 
 ## 단계 4 — 영역별 병렬 디스패치
 
-Agent 도구를 **한 메시지에 multi-tool-use** 로 호출. 영역별 sub-agent 는 자기 영역의 컨텍스트만 잡음 → 메인 컨텍스트 재로딩 비용 없음.
+`Agent` 도구를 **한 메시지에 multi-tool-use** 로 호출. 영역별 sub-agent 는 자기 영역의 컨텍스트만 잡음 → 메인 컨텍스트 재로딩 비용 없음. 각 sub-agent 프롬프트에는 **목적 + 계약 참조 + 완료 기준** 을 명시 (모호한 지시는 중복·엇나감을 부름).
 
 ```
-[메인]
+[메인 대화 — 이 skill 실행 중]
 계약 확정 완료. 3 sub-agent 병렬 호출:
 
 Agent(subagent_type=architect,
@@ -122,8 +138,9 @@ Agent(subagent_type=build-error-resolver,
 ```
 
 병렬 제약:
-- 같은 파일을 두 sub-agent 가 동시에 수정하면 충돌 → 단계 2 에서 변경 파일 집합을 영역별로 명확히 분리
-- 계약 변경이 발생하면 단계 3 으로 롤백 후 재진행 (재시도 1회까지)
+- 같은 파일을 두 sub-agent 가 동시에 수정하면 충돌 → 단계 2 에서 변경 파일 집합을 영역별로 명확히 분리. 충돌 위험이 크면 `isolation: worktree` 로 격리.
+- 계약 변경이 발생하면 단계 3 으로 롤백 후 재진행 (재시도 1회까지).
+- sub-agent 는 **요약만 회신** — 장문 결과를 그대로 받으면 메인 컨텍스트가 오염됨.
 
 ## 단계 5 — 결과 통합 + 검증
 
@@ -192,8 +209,9 @@ diff <(curl -s localhost:8000/openapi.json | jq -S) <(cat openapi.json | jq -S)
 
 ## 참조
 
-- `architect` — 영역별 설계 위임 시 권위
+- `architect` — 영역별 설계 위임 시 권위 (model: opus)
 - `code-reviewer`, `clean-arch-detector`, `fsd-violation-detector` — 검증 단계 위임
 - `fastapi-add-module` / `nestjs-add-module` / `react-add-feature` skill — 영역별 add-module 표준
 - `rules/typescript/{nestjs,react}.md`, `rules/python/fastapi.md` — 변형별 룰
-- `[[user-workflow]]` 의 개발 단계 — 본 agent 는 단일 영역이 아닌 feature 단위에서 호출됨
+- `docs/decisions/0004-orchestrator-as-skill.md` — agent → skill 전환 결정 근거
+- `[[user-workflow]]` 의 개발 단계 — 본 skill 은 단일 영역이 아닌 feature 단위에서 호출됨

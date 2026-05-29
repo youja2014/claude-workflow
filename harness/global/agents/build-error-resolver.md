@@ -1,5 +1,6 @@
 ---
 name: build-error-resolver
+model: sonnet
 description: Python / TypeScript 프로젝트의 빌드/런타임 에러를 진단하고 해결합니다. Import / Type / Dependency / Docker / Test / Lint 6 분류 + stack 별 진단 명령어 + 자주 발생하는 에러 매트릭스 (CRLF, 순환 참조, uv.lock 충돌, npm Exit handler, prisma generate, Nx generatePackageJson 누수 등). `/build-fix` skill 또는 에러 발생 시 위임 대상.
 ---
 

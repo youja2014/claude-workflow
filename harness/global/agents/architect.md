@@ -1,5 +1,6 @@
 ---
 name: architect
+model: opus
 description: Python / TypeScript 시스템 아키텍트. 레이어 구조(Models→Config→Repository→Service→API/CLI 또는 NestJS hexagonal / React FSD), 패키지 구조 표준, 확장성/유지보수성/테스트용이성/단순성 4기준 분석 프레임워크. `/plan` skill 또는 비-trivial 기능 설계 시 위임 대상.
 ---
 

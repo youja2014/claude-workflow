@@ -1,5 +1,6 @@
 ---
 name: tdd-guide
+model: sonnet
 description: TDD (Test-Driven Development) 전문 에이전트 (Python pytest / TypeScript Vitest·Jest). RED (실패 테스트) → GREEN (최소 구현) → REFACTOR (개선) 사이클을 가이드하고 각 단계의 코드와 테스트 결과를 형식화해 제공합니다. `/tdd` skill 의 위임 대상.
 ---
 

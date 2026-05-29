@@ -15,8 +15,8 @@
 
 - `harness/global/` — `~/.claude/` 에 배포되는 **글로벌** 컨텐츠. 모든 프로젝트 자동 적용. 5 하위 디렉토리:
   - `rules/` — 광역 코딩 표준 (`common/`: code-quality/git/security) + 스택별 (`python/`, `typescript/`)
-  - `agents/` — 전문 서브에이전트 (architect, code-reviewer, tdd-guide, build-error-resolver, clean-arch-detector, fsd-violation-detector, feature-orchestrator)
-  - `skills/` — 사용자 라이프사이클 [[user-workflow]] 지원 (scaffold + context-restore/save + plan + code-review) + 스택별 add-module (fastapi/nestjs/react)
+  - `agents/` — 전문 서브에이전트 (architect, code-reviewer, tdd-guide, build-error-resolver, clean-arch-detector, fsd-violation-detector). 각 frontmatter `model:` 로 티어링 (스캔류 haiku / 리뷰·빌드·TDD sonnet / architect opus). **서브에이전트는 다른 서브에이전트를 못 띄움 (깊이-1)** — 오케스트레이션은 skill 로 (ADR-0004).
+  - `skills/` — 사용자 라이프사이클 [[user-workflow]] 지원 (scaffold + context-restore/save + plan + code-review) + 스택별 add-module (fastapi/nestjs/react) + 멀티영역 오케스트레이션 (feature-orchestrator — 메인 대화 실행이라 Agent 도구로 dispatch 가능)
   - `hooks/` — 결정적 강제 (block-dangerous, format-on-save)
   - `scripts/` — 자산이 참조하는 헬퍼 (find-workflow-home.sh)
   - 수정 시 신중 — 모든 프로젝트에 영향.

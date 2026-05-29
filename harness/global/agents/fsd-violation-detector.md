@@ -1,5 +1,6 @@
 ---
 name: fsd-violation-detector
+model: haiku
 description: Feature-Sliced Design 기반 React 프로젝트({src,apps/web/src}/{app,pages,widgets,features,entities,shared}/)에서 레이어 의존 방향 위반을 탐지합니다. features 간 직접 import, 같은 레이어 슬라이스 간 import, public API(index.ts) 우회 import 등을 grep으로 스캔해 보고합니다.
 ---
 

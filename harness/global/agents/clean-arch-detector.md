@@ -1,5 +1,6 @@
 ---
 name: clean-arch-detector
+model: haiku
 description: Python (FastAPI hexagonal-lite) 또는 TypeScript (NestJS hexagonal) 프로젝트에서 클린 아키텍처 의존 방향 위반을 탐지합니다. 도메인 레이어가 프레임워크/ORM을 import하거나, ORM 모델이 컨트롤러 응답으로 직접 노출되는 경우를 grep 기반으로 찾아 보고서로 정리합니다.
 ---
 

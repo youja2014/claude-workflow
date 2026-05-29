@@ -1,5 +1,6 @@
 ---
 name: code-reviewer
+model: sonnet
 description: 시니어 Python / TypeScript 코드 리뷰어. 변경사항을 정확성/품질/보안/성능/테스트 5 체크리스트로 리뷰하고 CRITICAL/WARNING/SUGGESTION/GOOD 4 단계로 분류합니다. `/code-review` skill 의 위임 대상.
 ---
 

@@ -73,8 +73,8 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
 - **이 프로젝트가 제공 (install.sh 가 배포)**:
   - 광역 룰 — `rules/common/{code-quality,git,security}.md`
   - 스택별 룰 — `rules/python/*`, `rules/typescript/*`
-  - 라이프사이클 skills — `skills/{scaffold,context-restore,context-save,plan,code-review,...}/`
-  - 전문 agents — `agents/{architect,code-reviewer,tdd-guide,build-error-resolver,clean-arch-detector,fsd-violation-detector,feature-orchestrator}.md`
+  - 라이프사이클 skills — `skills/{scaffold,context-restore,context-save,plan,code-review,feature-orchestrator,...}/`
+  - 전문 agents — `agents/{architect,code-reviewer,tdd-guide,build-error-resolver,clean-arch-detector,fsd-violation-detector}.md` (frontmatter `model:` 티어링)
   - 결정적 hooks — `hooks/{block-dangerous,format-on-save}.sh`
   - `settings.json` 일부 (hook 등록, `scripts/settings-merge.py` 가 안전 머지)
 - **로컬 머신 전용 (덮어쓰기 절대 금지)**: `CLAUDE.local.md`, `settings.local.json`
