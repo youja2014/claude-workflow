@@ -120,6 +120,17 @@ write_file() {
   fi
 }
 
+remove_file() {
+  local path="$1"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    info "[dry] rm $path (orphan)"
+  else
+    rm -f "$path"
+    # Drop the parent dir if it is now empty (e.g. a removed skill's folder).
+    rmdir "$(dirname "$path")" 2>/dev/null || true
+  fi
+}
+
 # tmp lock to write atomically at end
 TMP_LOCK="$(mktemp)"
 echo "# claude-workflow installed files. Format: <sha256>  <relative-path>" > "$TMP_LOCK"
@@ -242,6 +253,47 @@ if [[ -n "$DEFERRED_SETTINGS" && "$SKIP_MERGE" != "1" ]]; then
     fi
   fi
 fi
+
+# --- Orphan prune ---------------------------------------------------------
+# Remove files a previous install wrote but that this version no longer ships.
+# Safety: only prune when the target still matches the checksum we recorded
+# (i.e. unchanged since we installed it). User-modified or drifted files are
+# preserved with a warning. settings.json and *.local.* are never in the lock,
+# so they can never be pruned here.
+declare -A CURRENT_MANAGED=()
+for rel in "${SRC_FILES[@]}"; do
+  b="$(basename "$rel")"
+  is_local_file "$b" && continue
+  is_merge_target "$b" && continue
+  CURRENT_MANAGED["$rel"]=1
+done
+
+ORPHANS_REMOVED=0
+if [[ -f "$LOCK_FILE" ]]; then
+  while IFS= read -r line; do
+    [[ "$line" =~ ^# ]] && continue
+    [[ -z "${line// /}" ]] && continue
+    rec_hash="$(awk '{print $1}' <<< "$line")"
+    rec_path="$(awk '{print $2}' <<< "$line")"
+    [[ -z "$rec_path" ]] && continue
+    [[ -n "${CURRENT_MANAGED[$rec_path]+x}" ]] && continue   # still shipped
+    dst="$TARGET_DIR/$rec_path"
+    [[ ! -e "$dst" ]] && continue                            # already gone
+    if [[ "$line" == *"user-modified"* ]]; then
+      warn "orphan (user-modified, preserved): $rec_path"
+      continue
+    fi
+    cur_hash="$(sha256_of "$dst")"
+    if [[ -n "$rec_hash" && "$cur_hash" == "$rec_hash" ]]; then
+      info "prune orphan: $rec_path"
+      remove_file "$dst"
+      ORPHANS_REMOVED=$((ORPHANS_REMOVED + 1))
+    else
+      warn "orphan (changed since install, preserved): $rec_path"
+    fi
+  done < "$LOCK_FILE"
+fi
+[[ "$ORPHANS_REMOVED" -gt 0 ]] && info "pruned $ORPHANS_REMOVED orphan file(s)"
 
 # Atomic lock write
 if [[ "$DRY_RUN" != "1" ]]; then

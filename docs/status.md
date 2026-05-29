@@ -5,8 +5,8 @@
 ## 현재 상태
 
 - branch: **`main`** (ADR-0003)
-- 로컬 커밋 누적: **55** (9th session 3 commits; origin/main 은 `63635ec`(App-3)까지 push 완료 — App-4 push 대기)
-- working tree: clean (9th session App-1~App-4 커밋 완료)
+- 로컬 커밋 누적: **56** (9th session 4 commits; origin/main 은 `ba9d336`(App-4)까지 push 완료 — orphan prune 커밋 push 대기)
+- working tree: clean (9th session App-1~App-4 + install orphan prune 커밋 완료)
 - remote: ✅ `origin = https://github.com/youja2014/claude-workflow.git` — main tracking, push 완료
 - 마지막 검증: pre-push `make verify` PASS (test-install + test-templates 3/3) — recovery commit push 시점
 
@@ -30,7 +30,9 @@
 - **App-3 (agentic-workflow 글로벌 룰)** — `rules/common/agentic-workflow.md` 신설. 컨텍스트 관리(/clear·/compact·탐색 위임), Explore→Plan→Code→Commit, 서브에이전트 깊이-1/요약회신, 멀티에이전트 사용 기준(리서치 강함/코딩 약함·~15x 토큰), 노력 스케일링, 모델 티어링, 검증·보안. coverage-matrix Rules 13→14. (커밋 `63635ec`)
 - **App-4 (`/plan` 4단계 강화)** — plan skill 에 "0. 워크플로 위치 — Explore→Plan→Code→Commit" 섹션 추가. read-only 규율(탐색·계획 단계 소스 변경 금지, Write 는 exec-plan 산출물만), 탐색 위임, 다음 단계(/tdd·commit·feature-orchestrator) 안내. agentic-workflow 룰 참조 연결.
 
-후속 (미적용): install orphan 정리 (제거된 자산 자동 삭제 — ADR-0004 비용 항목).
+- **install orphan prune** — `install.sh` 가 재install 시 lock 에 추적됐으나 소스에서 사라진 파일을 정리(체크섬 일치할 때만 — 사용자 수정/드리프트 파일은 보존+경고). `test-install.sh` 케이스 #6 추가(정상 prune / 드리프트 보존 / lock 제거 검증). ADR-0004 비용 항목 해소. **실측**: 현재 사용자 `~/.claude` 엔 추적 orphan 없어 즉시 영향 없음(향후 안전장치).
+
+후속 (미적용): 없음 — 9th session 리서치 적용(App-1~4) + orphan prune 모두 완료.
 
 ### 8th session (2026-05-17, 같은 날 두 번째 슬롯)
 

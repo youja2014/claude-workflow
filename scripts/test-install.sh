@@ -7,6 +7,8 @@
 #   3. Editing an installed file then re-running offers conflict resolution
 #   4. *.local.* files are never touched
 #   5. uninstall removes only files we own, preserves user-modified
+#   6. orphan prune: assets removed from source are cleaned on re-install
+#      (unchanged -> pruned; drifted/user-modified -> preserved)
 
 set -euo pipefail
 
@@ -103,6 +105,37 @@ pass "resolver locates source via lock's source_dir"
 # Lock must contain the source_dir record
 grep -q '^# source_dir=' "$CLAUDE_HOME/.claude-workflow.lock" || fail "lock missing # source_dir= line"
 pass "lock records source_dir"
+
+echo "=== 6. orphan prune (asset removed from source is cleaned on re-install) ==="
+# Start from a clean install so the lock reflects current source.
+bash "$ROOT_DIR/install.sh" --yes >/dev/null
+LOCK="$CLAUDE_HOME/.claude-workflow.lock"
+
+# 6a. Simulate a file a previous version shipped but current source no longer has,
+#     recorded in the lock with its real checksum (unchanged since install).
+ORPHAN_REL="agents/_obsolete-test-agent.md"
+ORPHAN_DST="$CLAUDE_HOME/$ORPHAN_REL"
+echo "obsolete managed content" > "$ORPHAN_DST"
+ORPHAN_HASH="$(sha256sum "$ORPHAN_DST" | awk '{print $1}')"
+echo "$ORPHAN_HASH  $ORPHAN_REL" >> "$LOCK"
+
+# 6b. Simulate an orphan that drifted since install (recorded hash != current content).
+#     Must be preserved, never silently deleted.
+KEEP_REL="agents/_obsolete-user-edited.md"
+KEEP_DST="$CLAUDE_HOME/$KEEP_REL"
+echo "this was edited by the user" > "$KEEP_DST"
+echo "0000000000000000000000000000000000000000000000000000000000000000  $KEEP_REL" >> "$LOCK"
+
+bash "$ROOT_DIR/install.sh" --yes >/dev/null
+
+[[ ! -e "$ORPHAN_DST" ]] || fail "orphan with matching checksum was not pruned"
+pass "orphan (unchanged) pruned"
+
+[[ -e "$KEEP_DST" ]] || fail "orphan with drifted checksum was wrongly deleted"
+pass "orphan (drifted) preserved"
+
+grep -q "$ORPHAN_REL" "$LOCK" && fail "pruned orphan still recorded in lock" || true
+pass "pruned orphan removed from lock"
 
 echo
 echo "test-install.sh: ALL PASS"
