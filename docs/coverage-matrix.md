@@ -4,13 +4,14 @@
 
 자산 통계 (2026-05-17 기준): rules 13 / agents 6 / skills 11 / hooks 2 / templates 3 = **총 35**.
 
-## Rules — 13 (`harness/global/rules/`)
+## Rules — 14 (`harness/global/rules/`)
 
 | Asset | general | python-cli | python-fastapi | ts-nx (api) | ts-nx (web) | 비고 |
 |---|---|---|---|---|---|---|
 | `common/code-quality.md` | ✅ | — | — | — | — | DRY/KISS/YAGNI/네이밍 |
 | `common/git.md` | ✅ | — | — | — | — | Conventional Commits. **브랜치 type 목록 명시 누락 (P1)** |
 | `common/security.md` | ✅ | — | — | — | — | 시크릿/입력/의존성/로깅 |
+| `common/agentic-workflow.md` | ✅ | — | — | — | — | 컨텍스트 관리/서브에이전트 깊이-1/멀티에이전트 기준/모델 티어링 (ADR-0004) |
 | `python/style.md` | — | ✅ | ✅ | N/A | N/A | 타입 힌트/비동기/Import |
 | `python/testing.md` | — | ✅ | ✅ | N/A | N/A | pytest/fixture/mock |
 | `python/docker.md` | — | ✅ | ✅ | N/A | N/A | python:3.12-slim, uv |

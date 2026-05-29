@@ -5,8 +5,8 @@
 ## 현재 상태
 
 - branch: **`main`** (ADR-0003)
-- 로컬 커밋 누적: **52** (8th session 6 commits, origin/main 동기) + 9th session 미커밋 변경
-- working tree: **변경 있음 (미커밋)** — 9th session App-1 (agent model 티어링) + App-2 (orchestrator agent→skill, ADR-0004). 커밋 대기.
+- 로컬 커밋 누적: **54** (8th session 6, 9th session 2; origin/main 은 52 까지 — 9th 2건 push 대기)
+- working tree: clean (9th session App-1/App-2/App-3 커밋 완료)
 - remote: ✅ `origin = https://github.com/youja2014/claude-workflow.git` — main tracking, push 완료
 - 마지막 검증: pre-push `make verify` PASS (test-install + test-templates 3/3) — recovery commit push 시점
 
@@ -21,14 +21,15 @@
 
 ## 최근 완료
 
-### 9th session (2026-05-29) — 리서치 기반 하네스 적용 (미커밋)
+### 9th session (2026-05-29) — 리서치 기반 하네스 적용
 
 "Claude 를 에이전트로 대형 개발에 빠르게 활용하는 법" 딥리서치 결과를 하네스에 적용:
 
-- **App-1 (agent model 티어링)** — 6개 agent frontmatter 에 `model:` 추가. 스캔류 (`clean-arch-detector`, `fsd-violation-detector`) `haiku`, 리뷰/빌드/TDD `sonnet`, `architect` `opus`. 근거: 공식 문서 (`code.claude.com/sub-agents`) 의 비용 제어 가이드. **사실 확정**: `model` 유효값 = `sonnet`/`opus`/`haiku`/풀 ID/`inherit`.
-- **App-2 (orchestrator agent→skill)** — `feature-orchestrator` 를 agent 에서 skill 로 전환. **실측 확정**: 서브에이전트는 `tools:*` 라도 하위 에이전트 생성 도구가 없음 (깊이-1) → agent 로는 병렬 dispatch 불가, skill (메인 대화 실행) 만 가능. ADR-0004 작성.
+- **App-1 (agent model 티어링)** — 6개 agent frontmatter 에 `model:` 추가. 스캔류 (`clean-arch-detector`, `fsd-violation-detector`) `haiku`, 리뷰/빌드/TDD `sonnet`, `architect` `opus`. 근거: 공식 문서 (`code.claude.com/sub-agents`) 의 비용 제어 가이드. **사실 확정**: `model` 유효값 = `sonnet`/`opus`/`haiku`/풀 ID/`inherit`. (커밋 `e9180cd`)
+- **App-2 (orchestrator agent→skill)** — `feature-orchestrator` 를 agent 에서 skill 로 전환. **실측 확정**: 서브에이전트는 `tools:*` 라도 하위 에이전트 생성 도구가 없음 (깊이-1) → agent 로는 병렬 dispatch 불가, skill (메인 대화 실행) 만 가능. ADR-0004 작성. (커밋 `e9180cd`)
+- **App-3 (agentic-workflow 글로벌 룰)** — `rules/common/agentic-workflow.md` 신설. 컨텍스트 관리(/clear·/compact·탐색 위임), Explore→Plan→Code→Commit, 서브에이전트 깊이-1/요약회신, 멀티에이전트 사용 기준(리서치 강함/코딩 약함·~15x 토큰), 노력 스케일링, 모델 티어링, 검증·보안. coverage-matrix Rules 13→14.
 
-후속 (미적용): App-3 (글로벌 룰 `agentic-workflow.md` — 컨텍스트 관리/멀티에이전트 사용 기준/노력 스케일링), App-4 (`/plan` 4단계 강화). install orphan 정리 (제거된 agent 파일 자동 삭제).
+후속 (미적용): App-4 (`/plan` 4단계 강화), install orphan 정리 (제거된 자산 자동 삭제).
 
 ### 8th session (2026-05-17, 같은 날 두 번째 슬롯)
 

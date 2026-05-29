@@ -71,7 +71,7 @@ make install-git-hooks  # .githooks/pre-push 활성화 → push 직전 자동 ve
 `~/.claude/` 에는 두 부류 파일이 공존합니다:
 
 - **이 프로젝트가 제공 (install.sh 가 배포)**:
-  - 광역 룰 — `rules/common/{code-quality,git,security}.md`
+  - 광역 룰 — `rules/common/{code-quality,git,security,agentic-workflow}.md`
   - 스택별 룰 — `rules/python/*`, `rules/typescript/*`
   - 라이프사이클 skills — `skills/{scaffold,context-restore,context-save,plan,code-review,feature-orchestrator,...}/`
   - 전문 agents — `agents/{architect,code-reviewer,tdd-guide,build-error-resolver,clean-arch-detector,fsd-violation-detector}.md` (frontmatter `model:` 티어링)
