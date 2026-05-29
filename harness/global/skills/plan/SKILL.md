@@ -17,6 +17,15 @@ argument-hint: "<feature-description>"
 
 `$ARGUMENTS` 의 기능에 대해 다음 순서로 분석합니다.
 
+## 0. 워크플로 위치 — Explore → Plan → Code → Commit
+
+Anthropic 베스트 프랙티스의 4단계 중 이 skill 은 **Explore(탐색) + Plan(계획)** 을 담당한다. 목적은 "엉뚱한 문제를 푸는 것"을 막는 것 (근거: `rules/common/agentic-workflow.md`).
+
+- **read-only 규율**: 이 단계에서는 **소스 코드를 수정하지 않는다**. 코드를 읽고 계획만 세운다. `Write` 는 오직 `docs/plans/exec-plans/<slug>.md` 산출물 저장에만 쓴다.
+- **컨텍스트 절약**: 파일을 많이 읽는 탐색은 `Explore` 에이전트나 서브에이전트에 위임해 메인 컨텍스트를 보존한다 (서브에이전트는 요약만 회신).
+- **다음 단계**: 계획 승인 후 **Code** 는 `/tdd` (RED→GREEN→REFACTOR) 또는 직접 구현, **Commit** 은 Conventional Commits 로. 멀티영역 feature 면 `feature-orchestrator` skill 로 dispatch.
+- **언제 건너뛰나**: 단순 버그 수정(1-2 파일), trivial 작업(rename/typo)은 plan 없이 바로 구현.
+
 ## 1. architect agent 위임 검토
 
 `~/.claude/agents/architect.md` 가 있고 기능 규모가 비-trivial (3+ 파일) 이면 우선 architect agent 에 위임. 작은 기능은 직접 진행.
@@ -99,6 +108,7 @@ related-decisions: []
 
 ## 참조
 
+- `rules/common/agentic-workflow.md` — Explore→Plan→Code→Commit, 컨텍스트 관리, 서브에이전트 위임
 - `rules/common/code-quality.md` — DRY/KISS/YAGNI
 - `rules/<stack>/*` — 스택별 패턴
-- architect agent (있다면)
+- architect agent (있다면) / `feature-orchestrator` skill (멀티영역 feature)
